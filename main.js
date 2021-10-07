@@ -1,0 +1,30 @@
+import Download from './core/downloader.js';
+import SetupColorsUI from './core/colors.js';
+import SetupImageDrop from './core/loader.js';
+import Mesher from './core/mesher.js';
+import Renderer from './core/renderer.js';
+import Editor from './scenes/editor.js';
+import World from './scenes/world.js';
+
+const renderer = new Renderer({
+  fps: document.getElementById('fps'),
+  renderer: document.getElementById('renderer'),
+});
+
+const mesher = new Mesher({
+  width: 512,
+  height: 256,
+  depth: 512,
+  chunkSize: 32,
+  onLoad: () => {
+    const world = new World({ mesher, renderer });
+    const editor = new Editor({ mesher, renderer, world });
+    renderer.views.push(world);
+    renderer.views.push(editor);
+    renderer.onResize();
+
+    SetupColorsUI();
+    SetupImageDrop({ editor, mesher, world });
+    document.getElementById('gltf').addEventListener('click', () => Download(world), false);
+  },
+});

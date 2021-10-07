@@ -1,0 +1,22 @@
+{
+  "name": "terrain",
+  "author": "Daniel Esteban Nombela",
+  "license": "MIT",
+  "scripts": {
+    "build": "rollup -c rollup.config.js",
+    "compile": "sh core/compile.sh",
+    "start": "npm run build -- -w"
+  },
+  "dependencies": {
+    "three": "^0.133.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13.0.5",
+    "@rollup/plugin-wasm": "^5.1.2",
+    "rollup": "^2.58.0",
+    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-livereload": "^2.0.5",
+    "rollup-plugin-serve": "^1.1.0",
+    "rollup-plugin-terser": "^7.0.2"
+  }
+}
