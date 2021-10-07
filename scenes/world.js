@@ -43,8 +43,8 @@ class World extends Scene {
   }
 
   onAnimationTick() {
-    const { controls } = this;
-    this.controls.enabled = this.mouse.x < 0.5;
+    const { controls, mouse } = this;
+    controls.enabled = mouse.x < 0.5;
     controls.update();
   }
 
