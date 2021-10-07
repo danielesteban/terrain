@@ -54,7 +54,7 @@ static void pushFace(
                       y2 = wy2,
                       z2 = wz2 - chunkZ,
                       x3 = wx3 - chunkX,
-                      y3 = wy3 ,
+                      y3 = wy3,
                       z3 = wz3 - chunkZ,
                       x4 = wx4 - chunkX,
                       y4 = wy4,

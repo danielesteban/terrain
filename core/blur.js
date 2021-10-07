@@ -18,7 +18,7 @@ const gaussCoef = (sigma) => {
   const right_corner = (a2 + a3) / (1 - b1 - b2);
 
   return new Float32Array([ a0, a1, a2, a3, b1, b2, left_corner, right_corner ]);
-}
+};
 
 const convolve = (src, out, line, coeff, width, height) => {
   let prev_src_r;
@@ -84,7 +84,7 @@ const convolve = (src, out, line, coeff, width, height) => {
       out_index -= height;
     }
   }
-}
+};
 
 export default (src, width, height, radius) => {
   const coeff    = gaussCoef(radius);
