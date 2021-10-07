@@ -1,5 +1,5 @@
-import Download from './core/downloader.js';
 import SetupColorsUI from './core/colors.js';
+import SetupDownloader from './core/downloader.js';
 import SetupImageDrop from './core/loader.js';
 import Mesher from './core/mesher.js';
 import Renderer from './core/renderer.js';
@@ -24,7 +24,11 @@ const mesher = new Mesher({
     renderer.onResize();
 
     SetupColorsUI();
+    SetupDownloader({ world });
     SetupImageDrop({ editor, mesher, world });
-    document.getElementById('gltf').addEventListener('click', () => Download(world), false);
+    document.getElementById('smooth').addEventListener('click', () => {
+      editor.texture.blur();
+      world.remesh();
+    }, false);
   },
 });

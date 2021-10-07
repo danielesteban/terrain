@@ -9,6 +9,7 @@ import {
   UniformsUtils,
   Vector2,
 } from 'three';
+import blur from '../core/blur.js';
 
 class Heightmap extends Mesh {
   static setupGeometry() {
@@ -49,11 +50,18 @@ class Heightmap extends Mesh {
     this.matrixAutoUpdate = false;
   }
 
+  blur(radius = 1) {
+    const { material: { map } } = this;
+    const { image: texture } = map;
+    blur(texture.data, texture.width, texture.height, radius);
+    map.needsUpdate = true;
+  }
+
   load(pixels, scale = 1) {
     const { material: { map } } = this;
     const { image: texture } = map;
     for (let p = 0, i = 0, l = pixels.length; p < l; p += 4, i++) {
-      texture.data[i] = ((pixels[p] + pixels[p + 1] + pixels[p + 2]) / 3 / 0xFF) * (pixels[p + 3] / 0xFF) * scale;
+      texture.data[i] = ((0.21 * pixels[p] + 0.71 * pixels[p + 1] + 0.07 * pixels[p + 2]) / 0xFF) * (pixels[p + 3] / 0xFF) * scale;
     }
     map.needsUpdate = true;
   }

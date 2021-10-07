@@ -16,7 +16,7 @@ class Mesher {
     this.width = width;
     this.height = height;
     this.depth = depth;
-    const maxFacesPerChunk = Math.ceil(chunkSize * height * chunkSize * 0.5) * 6;
+    const maxFacesPerChunk = Math.ceil(chunkSize * chunkSize * 0.5) * (height * 4 + 1);
     const layout = [
       { id: 'heightmap', type: Float32Array, size: width * depth },
       { id: 'vertices', type: Uint8Array, size: maxFacesPerChunk * 4 * 6 },
