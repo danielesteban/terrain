@@ -15,14 +15,6 @@ body {
   line-height: 1rem;
 }
 
-canvas {
-  vertical-align: middle;
-}
-
-#downloader {
-  display: none;
-}
-
 button {
   box-sizing: border-box;
   background: #393;
@@ -40,6 +32,10 @@ button {
   text-shadow: rgba(0, 0, 0, .4) 1px 2px;
 }
 
+canvas {
+  vertical-align: middle;
+}
+
 #actions {
   position: absolute;
   bottom: 1rem;
@@ -53,6 +49,10 @@ button {
   margin-left: 0.5rem;
 }
 
+#downloader {
+  display: none;
+}
+
 #info {
   position: absolute;
   bottom: 1rem;
@@ -60,14 +60,9 @@ button {
   opacity: 0.3;
 }
 
-body.pointerlock #info {
-  display: none;
-}
-
 #info > a {
   color: inherit;
 }
-
 
 #renderer {
   width: 100vw;
@@ -85,10 +80,6 @@ body.pointerlock #info {
   font-size: 13px;
   text-decoration: none;
   text-indent: -999999px;
-}
-
-body.pointerlock #ribbon {
-  display: none;
 }
 
 #ribbon:hover, #ribbon:active {
