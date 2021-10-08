@@ -14,14 +14,19 @@ const material = new MeshStandardMaterial({ vertexColors: true });
 export default ({ world }) => {
   document.getElementById('gltf').addEventListener('click', () => (
     exporter.parse(world.chunks.map(({ geometry, position }) => {
+      const { data: { array, count } } = geometry.getAttribute('position');
       const chunk = new Mesh(new BufferGeometry(), material);
-      const vertices = new InterleavedBuffer(new Float32Array(geometry.getAttribute('position').data.array), 6);
-      for (let i = 0; i < vertices.count * 6; i += 6) {
+      const vertices = new InterleavedBuffer(new Float32Array(count * 6), 6);
+      for (let i = 0, j = 0, l = count * 4; i < l; i += 4, j += 6) {
+        const ao = array[i + 3] / 0xFF;
         vertices.set([
-          vertices.array[i + 3] / 0xFF,
-          vertices.array[i + 4] / 0xFF,
-          vertices.array[i + 5] / 0xFF,
-        ], i + 3);
+          array[i],
+          array[i + 1],
+          array[i + 2],
+          1.0 - ao,
+          1.0 - ao,
+          1.0 - ao,
+        ], j);
       }
       chunk.geometry.setIndex(geometry.getIndex());
       chunk.geometry.setAttribute('position', new InterleavedBufferAttribute(vertices, 3, 0));

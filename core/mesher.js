@@ -20,7 +20,7 @@ class Mesher {
     const layout = [
       { id: 'bounds', type: Float32Array, size: 4 },
       { id: 'heightmap', type: Float32Array, size: width * depth },
-      { id: 'vertices', type: Uint8Array, size: maxFacesPerChunk * 4 * 6 },
+      { id: 'vertices', type: Uint8Array, size: maxFacesPerChunk * 4 * 4 },
       { id: 'indices', type: Uint32Array, size: maxFacesPerChunk * 6 },
       { id: 'world', type: Int32Array, size: 3 },
     ];
@@ -68,7 +68,7 @@ class Mesher {
       indices: new ((faces * 4 - 1) <= 65535 ? Uint16Array : Uint32Array)(
         memory.indices.view.subarray(0, faces * 6)
       ),
-      vertices: new Uint8Array(memory.vertices.view.subarray(0, faces * 4 * 6)),
+      vertices: new Uint8Array(memory.vertices.view.subarray(0, faces * 4 * 4)),
     };
   }
 }

@@ -33,6 +33,7 @@ class Chunk extends Mesh {
         .replace(
           '#include <common>',
           [
+            'attribute float ao;',
             'uniform float height;',
             'uniform vec3 colors[6];',
             '#include <common>',
@@ -42,7 +43,7 @@ class Chunk extends Mesh {
           '#include <color_vertex>',
           [
             'float colorStep = position.y / height * 5.0;',
-            'vColor.xyz = mix(colors[int(floor(colorStep))], colors[int(ceil(colorStep))], fract(colorStep)) * (color.xyz / 255.0);',
+            'vColor.xyz = mix(colors[int(floor(colorStep))], colors[int(ceil(colorStep))], fract(colorStep)) * vec3(1.0 - ao / 255.0);',
           ].join('\n')
         ),
       fragmentShader,
@@ -73,10 +74,10 @@ class Chunk extends Mesh {
 
   update({ bounds, indices, vertices }) {
     const { geometry } = this;
-    vertices = new InterleavedBuffer(vertices, 6);
+    vertices = new InterleavedBuffer(vertices, 4);
     geometry.setIndex(new BufferAttribute(indices, 1));
     geometry.setAttribute('position', new InterleavedBufferAttribute(vertices, 3, 0));
-    geometry.setAttribute('color', new InterleavedBufferAttribute(vertices, 3, 3));
+    geometry.setAttribute('ao', new InterleavedBufferAttribute(vertices, 1, 3));
     if (geometry.boundingSphere === null) {
       geometry.boundingSphere = new Sphere();
     }
