@@ -31,7 +31,7 @@ static const int getHeight(
   ) {
     return -1;
   }
-  return round(world->height * heightmap[z * world->width + x]);
+  return round(world->height * heightmap[z * world->width + x]) - 1;
 }
 
 static void growBox(

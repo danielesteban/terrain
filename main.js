@@ -12,9 +12,9 @@ const renderer = new Renderer({
 });
 
 const mesher = new Mesher({
-  width: 512,
-  height: 254,
-  depth: 512,
+  width: 640,
+  height: 255,
+  depth: 640,
   chunkSize: 32,
   onLoad: () => {
     const world = new World({ mesher, renderer });
