@@ -66,10 +66,10 @@ class Heightmap extends Mesh {
     map.needsUpdate = true;
   }
 
-  paint(point, brush, inc) {
+  paint(point, shape, radius, inc) {
     const { material: { map } } = this;
     const { image: texture } = map;
-    Heightmap.getBrush(brush).forEach(({ x, y }) => {
+    Heightmap.getBrush(shape, radius).forEach(({ x, y }) => {
       x = Math.floor(point.x * texture.width + x);
       y = Math.floor(point.y * texture.height + y);
       if (x < 0 || x >= texture.width || y < 0 || y >= texture.height) {
@@ -81,21 +81,26 @@ class Heightmap extends Mesh {
     map.needsUpdate = true;
   }
 
-  static getBrush(radius) {
-    let brush = Heightmap.brushes.get(radius);
+  static getBrush(shape, radius) {
+    let brush = Heightmap.brushes.get(`${shape}:${radius}`);
     if (!brush) {
       brush = [];
       const center = (new Vector2()).setScalar(0.5);
       for (let y = -radius; y <= radius + 1; y += 1) {
         for (let x = -radius; x <= radius + 1; x += 1) {
           const point = new Vector2(x, y);
-          if (point.distanceTo(center) <= radius) {
+          const distance = shape === 'square' ? (
+            Math.max(point.x - center.x, point.y - center.y)
+          ) : (
+            point[shape === 'diamond' ? 'manhattanDistanceTo' : 'distanceTo'](center)
+          );
+          if (distance <= radius) {
             brush.push(point);
           }
         }
       }
       brush.sort((a, b) => (a.distanceTo(center) - b.distanceTo(center)));
-      Heightmap.brushes.set(radius, brush);
+      Heightmap.brushes.set(`${shape}:${radius}`, brush);
     }
     return brush;
   }

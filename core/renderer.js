@@ -34,7 +34,7 @@ class Renderer {
     this.renderer.setAnimationLoop(this.onAnimationTick.bind(this));
 
     const mouse = this.mouse = { x: 0, y: 0, primary: false, secondary: false };
-    document.addEventListener('mousedown', ({ button }) => {
+    dom.renderer.addEventListener('mousedown', ({ button }) => {
       button === 0 && (mouse.primary = true);
       button === 2 && (mouse.secondary = true);
     });

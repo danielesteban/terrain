@@ -21,18 +21,43 @@ class Editor extends Scene {
     };
     this.viewport = {};
 
-    this.brush = { radius: 24, intensity: 0.75 };
+    this.brush = { enabled: true, shape: 'circle', radius: 31, intensity: 0.75 };
     this.pointer = new Vector2();
     this.raycaster = new Raycaster();
     this.texture = new Heightmap(mesher.memory.heightmap.view, mesher.width, mesher.depth);
     this.add(this.texture);
     this.mouse = renderer.mouse;
     this.world = world;
+
+    {
+      const dom = document.getElementById('brush');
+      const shape = document.createElement('select');
+      shape.style.marginRight = '0.5rem';
+      shape.style.textTransform = 'capitalize';
+      ['circle', 'diamond', 'square'].forEach((value) => {
+        const option = document.createElement('option');
+        option.innerText = value;
+        shape.appendChild(option);
+      });
+      shape.oninput = () => { this.brush.shape = shape.value; };
+      dom.appendChild(shape);
+      const radius = document.createElement('input');
+      radius.type = 'range';
+      radius.min = 1;
+      radius.step = 2;
+      radius.max = 31;
+      radius.oninput = () => { this.brush.radius = parseInt(radius.value, 10); };
+      dom.appendChild(radius);
+    }
   }
 
   onAnimationTick(animation) {
     const { brush, camera, mouse, pointer, raycaster, screen, texture, world } = this;
     if (!mouse.primary && !mouse.secondary) {
+      brush.enabled = mouse.x > 0.5;
+      return;
+    }
+    if (!brush.enabled) {
       return;
     }
     pointer
@@ -45,6 +70,7 @@ class Editor extends Scene {
       uv.y = 1.0 - uv.y;
       texture.paint(
         uv,
+        brush.shape,
         brush.radius,
         brush.intensity * animation.delta * (mouse.primary ? 1 : -1)
       );

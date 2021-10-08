@@ -49,6 +49,15 @@ canvas {
   margin-left: 0.5rem;
 }
 
+#brush {
+  position: absolute;
+  bottom: 1.4rem;
+  left: 50%;
+  padding-left: 1rem;
+  display: flex;
+  align-items: center;
+}
+
 #downloader {
   display: none;
 }
