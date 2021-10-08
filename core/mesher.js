@@ -5,18 +5,23 @@ class Mesher {
     width,
     height,
     depth,
-    chunkSize,
+    chunkHeight = 0x40,
+    chunkSize = 0x20,
     onLoad,
   }) {
+    if (width % chunkSize || depth % chunkSize) {
+      throw new Error('width and depth must be multiples of chunkSize');
+    }
     this.chunks = {
       x: width / chunkSize,
       z: depth / chunkSize,
     };
+    this.chunkHeight = chunkHeight;
     this.chunkSize = chunkSize;
     this.width = width;
     this.height = height;
     this.depth = depth;
-    const maxFacesPerChunk = Math.ceil(chunkSize * chunkSize * 0.5) * (height * 4 + 1);
+    const maxFacesPerChunk = Math.ceil(chunkSize * chunkSize * 0.5) * (Math.min(height, 0xFF) * 4 + 1);
     const layout = [
       { id: 'bounds', type: Float32Array, size: 4 },
       { id: 'heightmap', type: Float32Array, size: width * depth },
@@ -48,16 +53,18 @@ class Mesher {
       ));
   }
 
-  mesh(x, z) {
-    const { chunkSize, memory, _mesh } = this;
+  mesh(x, y, z) {
+    const { chunkHeight, chunkSize, memory, _mesh } = this;
     const faces = _mesh(
       memory.world.address,
       memory.heightmap.address,
       memory.bounds.address,
       memory.indices.address,
       memory.vertices.address,
+      chunkHeight,
       chunkSize,
       x * chunkSize,
+      y * chunkHeight,
       z * chunkSize
     );
     if (faces === 0) {

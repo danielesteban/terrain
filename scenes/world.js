@@ -28,13 +28,18 @@ class World extends Scene {
     const origin = { x: mesher.width * 0.5, z: mesher.depth * 0.5 };
     for (let z = 0; z < mesher.chunks.z; z++) {
       for (let x = 0; x < mesher.chunks.x; x++) {
-        const chunk = new Chunk({
-          x: x * mesher.chunkSize - origin.x,
-          z: z * mesher.chunkSize - origin.z,
-          geometry: mesher.mesh(x, z),
-        });
-        this.chunks.push(chunk);
-        this.add(chunk);
+        const subchunks = [];
+        for (let y = 0; y < Math.ceil(mesher.height / mesher.chunkHeight); y++) {
+          const chunk = new Chunk({
+            x: x * mesher.chunkSize - origin.x,
+            y: y * mesher.chunkHeight,
+            z: z * mesher.chunkSize - origin.z,
+            geometry: mesher.mesh(x, y, z),
+          });
+          subchunks.push(chunk);
+          this.add(chunk);
+        }
+        this.chunks.push(subchunks);
       }
     }
     Chunk.material.uniforms.height.value = mesher.height;
@@ -58,7 +63,7 @@ class World extends Scene {
     const toZ = Math.min(fromZ + 2, mesher.chunks.z - 1);
     for (let z = fromZ; z <= toZ; z++) {
       for (let x = fromX; x <= toX; x++) {
-        chunks[z * mesher.chunks.x + x].update(mesher.mesh(x, z));
+        chunks[z * mesher.chunks.x + x].forEach((subchunk, y) => subchunk.update(mesher.mesh(x, y, z)));
       }
     }
   }
@@ -67,7 +72,7 @@ class World extends Scene {
     const { chunks, mesher } = this;
     for (let z = 0, i = 0; z < mesher.chunks.z; z++) {
       for (let x = 0; x < mesher.chunks.x; x++, i++) {
-        chunks[i].update(mesher.mesh(x, z));
+        chunks[i].forEach((subchunk, y) => subchunk.update(mesher.mesh(x, y, z)));
       }
     }
   }

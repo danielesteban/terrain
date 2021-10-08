@@ -15,7 +15,6 @@ const mesher = new Mesher({
   width: 640,
   height: 255,
   depth: 640,
-  chunkSize: 32,
   onLoad: () => {
     const world = new World({ mesher, renderer });
     const editor = new Editor({ mesher, renderer, world });

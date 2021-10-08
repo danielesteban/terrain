@@ -42,7 +42,7 @@ class Chunk extends Mesh {
         .replace(
           '#include <color_vertex>',
           [
-            'float colorStep = position.y / height * 5.0;',
+            'float colorStep = (modelMatrix * vec4(position, 1.0)).y / height * 5.0;',
             'vColor.xyz = mix(colors[int(floor(colorStep))], colors[int(ceil(colorStep))], fract(colorStep)) * vec3(1.0 - ao / 255.0);',
           ].join('\n')
         ),
@@ -52,17 +52,15 @@ class Chunk extends Mesh {
   }
 
   constructor({
-    x, z,
+    x, y, z,
     geometry,
   }) {
     if (!Chunk.material) {
       Chunk.setupMaterial();
     }
     super(new BufferGeometry(), Chunk.material);
-    if (geometry && geometry.indices.length > 0) {
-      this.update(geometry);
-    }
-    this.position.set(x, 0, z);
+    this.update(geometry);
+    this.position.set(x, y, z);
     this.updateMatrixWorld();
     this.matrixAutoUpdate = false;
   }
@@ -72,7 +70,11 @@ class Chunk extends Mesh {
     geometry.dispose();
   }
 
-  update({ bounds, indices, vertices }) {
+  update({ bounds, indices, vertices } = {}) {
+    if (!indices || !indices.length) {
+      this.visible = false;
+      return;
+    }
     const { geometry } = this;
     vertices = new InterleavedBuffer(vertices, 4);
     geometry.setIndex(new BufferAttribute(indices, 1));
@@ -82,6 +84,7 @@ class Chunk extends Mesh {
       geometry.boundingSphere = new Sphere();
     }
     geometry.boundingSphere.set({ x: bounds[0], y: bounds[1], z: bounds[2] }, bounds[3]);
+    this.visible = true;
   }
 }
 

@@ -29,9 +29,9 @@ static const int getHeight(
     x < 0 || x >= world->width
     || z < 0 || z >= world->depth
   ) {
-    return -1;
+    return 0;
   }
-  return round(world->height * heightmap[z * world->width + x]) - 1;
+  return round(world->height * heightmap[z * world->width + x]);
 }
 
 static void growBox(
@@ -53,7 +53,7 @@ static void pushFace(
   unsigned int* faces,
   unsigned int* indices,
   unsigned char* vertices,
-  const int chunkX, const int chunkZ,
+  const int chunkX, const int chunkY, const int chunkZ,
   const int wx1, const int wy1, const int wz1, const unsigned char ao1,
   const int wx2, const int wy2, const int wz2, const unsigned char ao2,
   const int wx3, const int wy3, const int wz3, const unsigned char ao3,
@@ -63,16 +63,16 @@ static void pushFace(
                       indexOffset = *faces * 6,
                       flipFace = ((int) ao1 + ao3) > ((int) ao2 + ao4) ? 1 : 0; // Fixes interpolation anisotropy
   const unsigned char x1 = wx1 - chunkX,
-                      y1 = wy1,
+                      y1 = wy1 - chunkY,
                       z1 = wz1 - chunkZ,
                       x2 = wx2 - chunkX,
-                      y2 = wy2,
+                      y2 = wy2 - chunkY,
                       z2 = wz2 - chunkZ,
                       x3 = wx3 - chunkX,
-                      y3 = wy3,
+                      y3 = wy3 - chunkY,
                       z3 = wz3 - chunkZ,
                       x4 = wx4 - chunkX,
-                      y4 = wy4,
+                      y4 = wy4 - chunkY,
                       z4 = wz4 - chunkZ;
   unsigned int        vertexOffset = vertex * 4;
   (*faces)++;
@@ -111,24 +111,31 @@ const int mesh(
   float* bounds,
   unsigned int* indices,
   unsigned char* vertices,
+  const unsigned char chunkHeight,
   const unsigned char chunkSize,
   const int chunkX,
+  const int chunkY,
   const int chunkZ
 ) {
   if (
     chunkX < 0
+    || chunkY < 0
     || chunkZ < 0
     || chunkX + chunkSize > world->width
+    || chunkY >= world->height
     || chunkZ + chunkSize > world->depth
   ) {
     return -1;
   }
   // WELCOME TO THE JUNGLE !!
-  unsigned char box[6] = { chunkSize, world->height, chunkSize, 0, 0, 0 };
+  unsigned char box[6] = { chunkSize, chunkHeight, chunkSize, 0, 0, 0 };
   unsigned int faces = 0;
   for (int z = chunkZ; z < chunkZ + chunkSize; z++) {
     for (int x = chunkX; x < chunkX + chunkSize; x++) {
       const int height = getHeight(world, heightmap, x, z);
+      if (height < chunkY) {
+        continue;
+      }
       const int south = getHeight(world, heightmap, x, z + 1),
                 north = getHeight(world, heightmap, x, z - 1),
                 southeast = getHeight(world, heightmap, x + 1, z + 1),
@@ -142,14 +149,17 @@ const int mesh(
       if (y > north) y = north;
       if (y > east) y = east;
       if (y > west) y = west;
-      for (; y <= height; y++) {
+      if (y < chunkY) y = chunkY;
+      int top = chunkY + chunkHeight - 1;
+      if (top > height) top = height;
+      for (; y <= top; y++) {
         if (y == height) {
           pushFace(
             box,
             &faces,
             indices,
             vertices,
-            chunkX, chunkZ,
+            chunkX, chunkY, chunkZ,
             x, y + 1, z + 1,
             getAO(west > y, south > y, southwest > y),
             x + 1, y + 1, z + 1,
@@ -166,7 +176,7 @@ const int mesh(
             &faces,
             indices,
             vertices,
-            chunkX, chunkZ,
+            chunkX, chunkY, chunkZ,
             x, y, z + 1,
             getAO(southwest >= y, south == y - 1, southwest >= y - 1),
             x + 1, y, z + 1,
@@ -183,7 +193,7 @@ const int mesh(
             &faces,
             indices,
             vertices,
-            chunkX, chunkZ,
+            chunkX, chunkY, chunkZ,
             x + 1, y, z,
             getAO(northeast >= y, north == y - 1, northeast >= y - 1),
             x, y, z,
@@ -200,7 +210,7 @@ const int mesh(
             &faces,
             indices,
             vertices,
-            chunkX, chunkZ,
+            chunkX, chunkY, chunkZ,
             x + 1, y, z + 1,
             getAO(southeast >= y, east == y - 1, southeast >= y - 1),
             x + 1, y, z,
@@ -217,7 +227,7 @@ const int mesh(
             &faces,
             indices,
             vertices,
-            chunkX, chunkZ,
+            chunkX, chunkY, chunkZ,
             x, y, z,
             getAO(northwest >= y, west == y - 1, northwest >= y - 1),
             x, y, z + 1,
