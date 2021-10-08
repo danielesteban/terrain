@@ -31,10 +31,25 @@ static const int getHeight(
   ) {
     return -1;
   }
-  return round((world->height - 2) * heightmap[z * world->width + x]);
+  return round(world->height * heightmap[z * world->width + x]);
+}
+
+static void growBox(
+  unsigned char* box,
+  const unsigned char x,
+  const unsigned char y,
+  const unsigned char z
+) {
+  if (box[0] > x) box[0] = x;
+  if (box[1] > y) box[1] = y;
+  if (box[2] > z) box[2] = z;
+  if (box[3] < x) box[3] = x;
+  if (box[4] < y) box[4] = y;
+  if (box[5] < z) box[5] = z;
 }
 
 static void pushFace(
+  unsigned char* box,
   unsigned int* faces,
   unsigned int* indices,
   unsigned char* vertices,
@@ -92,11 +107,16 @@ static void pushFace(
   indices[indexOffset + 3] = vertex + flipFace + 2;
   indices[indexOffset + 4] = vertex + ((flipFace + 3) % 4);
   indices[indexOffset + 5] = vertex + flipFace;
+  growBox(box, x1, y1, z1);
+  growBox(box, x2, y2, z2);
+  growBox(box, x3, y3, z3);
+  growBox(box, x4, y4, z4);
 }
 
 const int mesh(
   const World* world,
   const float* heightmap,
+  float* bounds,
   unsigned int* indices,
   unsigned char* vertices,
   const unsigned char chunkSize,
@@ -112,21 +132,28 @@ const int mesh(
     return -1;
   }
   // WELCOME TO THE JUNGLE !!
+  unsigned char box[6] = { chunkSize, world->height, chunkSize, 0, 0, 0 };
   unsigned int faces = 0;
   for (int z = chunkZ; z < chunkZ + chunkSize; z++) {
     for (int x = chunkX; x < chunkX + chunkSize; x++) {
-        const int height = getHeight(world, heightmap, x, z);
-        const int south = getHeight(world, heightmap, x, z + 1),
-                  north = getHeight(world, heightmap, x, z - 1),
-                  southeast = getHeight(world, heightmap, x + 1, z + 1),
-                  southwest = getHeight(world, heightmap, x - 1, z + 1),
-                  northeast = getHeight(world, heightmap, x + 1, z - 1),
-                  northwest = getHeight(world, heightmap, x - 1, z - 1),
-                  east = getHeight(world, heightmap, x + 1, z),
-                  west = getHeight(world, heightmap, x - 1, z);
-      for (int y = 0; y <= height; y++) {
+      const int height = getHeight(world, heightmap, x, z);
+      const int south = getHeight(world, heightmap, x, z + 1),
+                north = getHeight(world, heightmap, x, z - 1),
+                southeast = getHeight(world, heightmap, x + 1, z + 1),
+                southwest = getHeight(world, heightmap, x - 1, z + 1),
+                northeast = getHeight(world, heightmap, x + 1, z - 1),
+                northwest = getHeight(world, heightmap, x - 1, z - 1),
+                east = getHeight(world, heightmap, x + 1, z),
+                west = getHeight(world, heightmap, x - 1, z);
+      int y = height;
+      if (y > south) y = south;
+      if (y > north) y = north;
+      if (y > east) y = east;
+      if (y > west) y = west;
+      for (; y <= height; y++) {
         if (y == height) {
           pushFace(
+            box,
             &faces,
             indices,
             vertices,
@@ -143,6 +170,7 @@ const int mesh(
         }
         if (y > south) {
           pushFace(
+            box,
             &faces,
             indices,
             vertices,
@@ -159,6 +187,7 @@ const int mesh(
         }
         if (y > north) {
           pushFace(
+            box,
             &faces,
             indices,
             vertices,
@@ -175,6 +204,7 @@ const int mesh(
         }
         if (y > east) {
           pushFace(
+            box,
             &faces,
             indices,
             vertices,
@@ -191,6 +221,7 @@ const int mesh(
         }
         if (y > west) {
           pushFace(
+            box,
             &faces,
             indices,
             vertices,
@@ -208,6 +239,18 @@ const int mesh(
       }
     }
   }
+
+  const float halfWidth = 0.5f * (box[3] - box[0]),
+              halfHeight = 0.5f * (box[4] - box[1]),
+              halfDepth = 0.5f * (box[5] - box[2]);
+  bounds[0] = 0.5f * (box[0] + box[3]);
+  bounds[1] = 0.5f * (box[1] + box[4]);
+  bounds[2] = 0.5f * (box[2] + box[5]);
+  bounds[3] = sqrt(
+    halfWidth * halfWidth
+    + halfHeight * halfHeight
+    + halfDepth * halfDepth
+  );
 
   return faces;
 }

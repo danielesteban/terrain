@@ -13,7 +13,7 @@ const renderer = new Renderer({
 
 const mesher = new Mesher({
   width: 512,
-  height: 256,
+  height: 254,
   depth: 512,
   chunkSize: 32,
   onLoad: () => {

@@ -18,6 +18,7 @@ class Mesher {
     this.depth = depth;
     const maxFacesPerChunk = Math.ceil(chunkSize * chunkSize * 0.5) * (height * 4 + 1);
     const layout = [
+      { id: 'bounds', type: Float32Array, size: 4 },
       { id: 'heightmap', type: Float32Array, size: width * depth },
       { id: 'vertices', type: Uint8Array, size: maxFacesPerChunk * 4 * 6 },
       { id: 'indices', type: Uint32Array, size: maxFacesPerChunk * 6 },
@@ -52,6 +53,7 @@ class Mesher {
     const faces = _mesh(
       memory.world.address,
       memory.heightmap.address,
+      memory.bounds.address,
       memory.indices.address,
       memory.vertices.address,
       chunkSize,
@@ -62,6 +64,7 @@ class Mesher {
       return false;
     }
     return {
+      bounds: new Float32Array(memory.bounds.view),
       indices: new ((faces * 4 - 1) <= 65535 ? Uint16Array : Uint32Array)(
         memory.indices.view.subarray(0, faces * 6)
       ),
