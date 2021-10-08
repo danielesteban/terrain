@@ -44,7 +44,9 @@ class World extends Scene {
 
   onAnimationTick() {
     const { controls, mouse } = this;
-    controls.enabled = mouse.x < 0.5;
+    if (!mouse.primary && !mouse.secondary) {
+      controls.enabled = mouse.x < 0.5;
+    }
     controls.update();
   }
 
