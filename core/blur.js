@@ -1,3 +1,6 @@
+// This is a copy pasta of https://github.com/nodeca/glur/blob/master/index.js
+// Modified to work with a single 32bit red channel instead of 32bit RGBA
+
 const gaussCoef = (sigma) => {
   if (sigma < 0.5) {
     sigma = 0.5;
@@ -21,11 +24,11 @@ const gaussCoef = (sigma) => {
 };
 
 const convolve = (src, out, line, coeff, width, height) => {
-  let prev_src_r;
-  let curr_src_r;
-  let curr_out_r;
-  let prev_out_r;
-  let prev_prev_out_r;
+  let prev_src;
+  let curr_src;
+  let curr_out;
+  let prev_out;
+  let prev_prev_out;
 
   let src_index, out_index, line_index;
   let i, j;
@@ -37,9 +40,9 @@ const convolve = (src, out, line, coeff, width, height) => {
     line_index = 0;
 
     // left to right
-    prev_src_r = src[src_index];
-    prev_prev_out_r = prev_src_r * coeff[6];
-    prev_out_r = prev_prev_out_r;
+    prev_src = src[src_index];
+    prev_prev_out = prev_src * coeff[6];
+    prev_out = prev_prev_out;
    
     coeff_a0 = coeff[0];
     coeff_a1 = coeff[1];
@@ -47,12 +50,12 @@ const convolve = (src, out, line, coeff, width, height) => {
     coeff_b2 = coeff[5];
 
     for (j = 0; j < width; j++) {
-      curr_src_r = src[src_index];
-      curr_out_r = curr_src_r * coeff_a0 + prev_src_r * coeff_a1 + prev_out_r * coeff_b1 + prev_prev_out_r * coeff_b2;
-      prev_prev_out_r = prev_out_r;
-      prev_out_r = curr_out_r;
-      prev_src_r = curr_src_r;
-      line[line_index] = prev_out_r;
+      curr_src = src[src_index];
+      curr_out = curr_src * coeff_a0 + prev_src * coeff_a1 + prev_out * coeff_b1 + prev_prev_out * coeff_b2;
+      prev_prev_out = prev_out;
+      prev_out = curr_out;
+      prev_src = curr_src;
+      line[line_index] = prev_out;
   
       line_index++;
       src_index++;
@@ -63,21 +66,21 @@ const convolve = (src, out, line, coeff, width, height) => {
     out_index += height * (width - 1);
 
     // right to left
-    prev_src_r = src[src_index];
-    prev_prev_out_r = prev_src_r * coeff[7];
-    prev_out_r = prev_prev_out_r;
-    curr_src_r = prev_src_r;
+    prev_src = src[src_index];
+    prev_prev_out = prev_src * coeff[7];
+    prev_out = prev_prev_out;
+    curr_src = prev_src;
 
     coeff_a0 = coeff[2];
     coeff_a1 = coeff[3];
 
     for (j = width - 1; j >= 0; j--) {
-      curr_out_r = curr_src_r * coeff_a0 + prev_src_r * coeff_a1 + prev_out_r * coeff_b1 + prev_prev_out_r * coeff_b2;
-      prev_prev_out_r = prev_out_r;
-      prev_out_r = curr_out_r;
-      prev_src_r = curr_src_r;
-      curr_src_r = src[src_index];
-      out[out_index] = line[line_index] + prev_out_r;
+      curr_out = curr_src * coeff_a0 + prev_src * coeff_a1 + prev_out * coeff_b1 + prev_prev_out * coeff_b2;
+      prev_prev_out = prev_out;
+      prev_out = curr_out;
+      prev_src = curr_src;
+      curr_src = src[src_index];
+      out[out_index] = line[line_index] + prev_out;
 
       src_index--;
       line_index--;
