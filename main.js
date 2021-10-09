@@ -24,7 +24,7 @@ const mesher = new Mesher({
 
     SetupColorsUI();
     SetupExporter({ world });
-    SetupImporter({ editor, mesher, world });
+    SetupImporter({ editor, world });
     document.getElementById('smooth').addEventListener('click', () => {
       editor.maps.blur();
       world.remesh();

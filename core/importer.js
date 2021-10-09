@@ -1,8 +1,8 @@
-export default ({ editor, mesher, world }) => {
+export default ({ editor, world }) => {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  canvas.width = mesher.width;
-  canvas.height = mesher.depth;
+  canvas.width = world.mesher.width;
+  canvas.height = world.mesher.depth;
   const load = (file) => {
     if (!file || file.type.indexOf('image') !== 0) {
       return;
