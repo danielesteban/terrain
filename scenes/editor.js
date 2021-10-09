@@ -35,58 +35,7 @@ class Editor extends Scene {
     this.mouse = renderer.mouse;
     this.world = world;
 
-    {
-      let color;
-      const editor = document.getElementById('editor');
-      const brush = document.getElementById('brush');
-      const map = document.createElement('select');
-      map.style.textTransform = 'capitalize';
-      ['color', 'height', 'height+color'].forEach((value) => {
-        const option = document.createElement('option');
-        option.innerText = value;
-        map.appendChild(option);
-      });
-      map.value = 'height+color';
-      map.oninput = () => {
-        this.maps.display(map.value);
-        color.style.display = map.value === 'color' ? '' : 'none';
-      };
-      editor.appendChild(map);
-      color = document.createElement('input');
-      color.style.marginRight = '0.5rem';
-      color.style.display = 'none';
-      color.type = 'color';
-      const aux = (new Color()).setRGB(
-        this.brush.color[0] / 0xFF,
-        this.brush.color[1] / 0xFF,
-        this.brush.color[2] / 0xFF
-      );
-      color.value = `#${aux.convertLinearToSRGB().getHexString()}`;
-      color.oninput = () => {
-        aux.set(color.value).convertSRGBToLinear();
-        this.brush.color[0] = Math.floor(aux.r * 0xFF);
-        this.brush.color[1] = Math.floor(aux.g * 0xFF);
-        this.brush.color[2] = Math.floor(aux.b * 0xFF);
-      };
-      brush.appendChild(color);
-      const shape = document.createElement('select');
-      shape.style.marginRight = '0.5rem';
-      shape.style.textTransform = 'capitalize';
-      ['circle', 'diamond', 'square'].forEach((value) => {
-        const option = document.createElement('option');
-        option.innerText = value;
-        shape.appendChild(option);
-      });
-      shape.oninput = () => { this.brush.shape = shape.value; };
-      brush.appendChild(shape);
-      const radius = document.createElement('input');
-      radius.type = 'range';
-      radius.min = 1;
-      radius.step = 2;
-      radius.max = 31;
-      radius.oninput = () => { this.brush.radius = parseInt(radius.value, 10); };
-      brush.appendChild(radius);
-    }
+    this.setupUI();
   }
 
   onAnimationTick(animation) {
@@ -138,6 +87,60 @@ class Editor extends Scene {
     camera.right = x + w;
     camera.top = y + h;
     camera.updateProjectionMatrix();
+  }
+
+  setupUI() {
+    let color;
+    const editor = document.getElementById('editor');
+    const map = document.createElement('select');
+    map.style.textTransform = 'capitalize';
+    ['color', 'height', 'height+color'].forEach((value) => {
+      const option = document.createElement('option');
+      option.innerText = value;
+      map.appendChild(option);
+    });
+    map.value = 'height+color';
+    map.oninput = () => {
+      this.maps.display(map.value);
+      color.style.display = map.value === 'color' ? '' : 'none';
+    };
+    editor.appendChild(map);
+
+    const brush = document.getElementById('brush');
+    color = document.createElement('input');
+    color.style.marginRight = '0.5rem';
+    color.style.display = 'none';
+    color.type = 'color';
+    const aux = (new Color()).setRGB(
+      this.brush.color[0] / 0xFF,
+      this.brush.color[1] / 0xFF,
+      this.brush.color[2] / 0xFF
+    );
+    color.value = `#${aux.convertLinearToSRGB().getHexString()}`;
+    color.oninput = () => {
+      aux.set(color.value).convertSRGBToLinear();
+      this.brush.color[0] = Math.floor(aux.r * 0xFF);
+      this.brush.color[1] = Math.floor(aux.g * 0xFF);
+      this.brush.color[2] = Math.floor(aux.b * 0xFF);
+    };
+    brush.appendChild(color);
+    const shape = document.createElement('select');
+    shape.style.marginRight = '0.5rem';
+    shape.style.textTransform = 'capitalize';
+    ['circle', 'diamond', 'square'].forEach((value) => {
+      const option = document.createElement('option');
+      option.innerText = value;
+      shape.appendChild(option);
+    });
+    shape.oninput = () => { this.brush.shape = shape.value; };
+    brush.appendChild(shape);
+    const radius = document.createElement('input');
+    radius.type = 'range';
+    radius.min = 1;
+    radius.step = 2;
+    radius.max = 31;
+    radius.oninput = () => { this.brush.radius = parseInt(radius.value, 10); };
+    brush.appendChild(radius);
   }
 }
 
