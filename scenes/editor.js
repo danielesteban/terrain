@@ -36,37 +36,25 @@ class Editor extends Scene {
     this.world = world;
 
     {
+      let color;
       const dom = document.getElementById('brush');
       const map = document.createElement('select');
       map.style.marginRight = '0.5rem';
       map.style.textTransform = 'capitalize';
-      ['color', 'height'].forEach((value) => {
+      ['color', 'height', 'height+color'].forEach((value) => {
         const option = document.createElement('option');
         option.innerText = value;
         map.appendChild(option);
       });
-      map.value = 'height';
-      map.oninput = () => { this.maps.display(map.value); };
+      map.value = 'height+color';
+      map.oninput = () => {
+        this.maps.display(map.value);
+        color.style.display = map.value === 'color' ? '' : 'none';
+      };
       dom.appendChild(map);
-      const shape = document.createElement('select');
-      shape.style.marginRight = '0.5rem';
-      shape.style.textTransform = 'capitalize';
-      ['circle', 'diamond', 'square'].forEach((value) => {
-        const option = document.createElement('option');
-        option.innerText = value;
-        shape.appendChild(option);
-      });
-      shape.oninput = () => { this.brush.shape = shape.value; };
-      dom.appendChild(shape);
-      const radius = document.createElement('input');
-      radius.style.marginRight = '0.5rem';
-      radius.type = 'range';
-      radius.min = 1;
-      radius.step = 2;
-      radius.max = 31;
-      radius.oninput = () => { this.brush.radius = parseInt(radius.value, 10); };
-      dom.appendChild(radius);
-      const color = document.createElement('input');
+      color = document.createElement('input');
+      color.style.marginRight = '0.5rem';
+      color.style.display = 'none';
       color.type = 'color';
       const aux = (new Color()).setRGB(
         this.brush.color[0] / 0xFF,
@@ -81,6 +69,23 @@ class Editor extends Scene {
         this.brush.color[2] = Math.floor(aux.b * 0xFF);
       };
       dom.appendChild(color);
+      const shape = document.createElement('select');
+      shape.style.marginRight = '0.5rem';
+      shape.style.textTransform = 'capitalize';
+      ['circle', 'diamond', 'square'].forEach((value) => {
+        const option = document.createElement('option');
+        option.innerText = value;
+        shape.appendChild(option);
+      });
+      shape.oninput = () => { this.brush.shape = shape.value; };
+      dom.appendChild(shape);
+      const radius = document.createElement('input');
+      radius.type = 'range';
+      radius.min = 1;
+      radius.step = 2;
+      radius.max = 31;
+      radius.oninput = () => { this.brush.radius = parseInt(radius.value, 10); };
+      dom.appendChild(radius);
     }
   }
 
@@ -108,7 +113,7 @@ class Editor extends Scene {
         brush.color,
         brush.blending * animation.delta * (mouse.primary ? 1 : -1)
       );
-      if (maps.material.map === maps.maps.height) {
+      if (maps.material.uniforms.display.value > 0) {
         world.onUpdate(uv);
       }
     }

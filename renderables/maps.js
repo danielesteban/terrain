@@ -19,22 +19,27 @@ class Maps extends Mesh {
     Maps.material = new ShaderMaterial({
       uniforms: {
         ...UniformsUtils.clone(uniforms),
-        height: { value: false },
+        display: { value: 0 },
+        heightmap: { value: null },
       },
       vertexShader,
       fragmentShader: fragmentShader
         .replace(
           '#include <common>',
           [
-            'uniform bool height;',
+            'uniform int display;',
+            'uniform sampler2D heightmap;',
             '#include <common>',
           ].join('\n')
         )
         .replace(
           '#include <map_fragment>',
           [
-            '#include <map_fragment>',
-            'if (height) diffuseColor.yz = diffuseColor.xx;',
+            'vec3 texelColor = mapTexelToLinear(texture2D( map, vUv )).xyz;',
+            'vec3 texelHeight = mapTexelToLinear(texture2D( heightmap, vUv )).xxx;',
+            'if (display == 0) diffuseColor.xyz *= texelColor;',
+            'else if (display == 1) diffuseColor.xyz *= texelHeight;',
+            'else if (display == 2) diffuseColor.xyz *= texelColor * texelHeight;',
           ].join('\n')
         ),
     });
@@ -47,13 +52,16 @@ class Maps extends Mesh {
     if (!Maps.material) {
       Maps.setupMaterial();
     }
+    const material = Maps.material.clone();
+    material.map = material.uniforms.map.value = maps.color;
+    material.uniforms.heightmap.value = maps.height;
     super(
       Maps.geometry,
-      Maps.material.clone()
+      material
     );
     this.matrixAutoUpdate = false;
     this.maps = maps;
-    this.display('height');
+    this.display('height+color');
   }
 
   blur(radius = 1) {
@@ -63,23 +71,27 @@ class Maps extends Mesh {
   }
   
   display(map) {
-    const { maps, material } = this;
-    material.map = material.uniforms.map.value = maps[map];
-    material.uniforms.height.value = map === 'height';
+    const { material } = this;
+    material.uniforms.display.value = ['color', 'height', 'height+color'].indexOf(map);
   }
 
   load(pixels, scale = 1) {
-    const { maps } = this;
+    const { maps, material: { uniforms: { display: { value: display } } } } = this;
     for (let p = 0, c = 0, h = 0, l = pixels.length; p < l; p += 4, c += 3, h++) {
-      maps.color.image.data.set([pixels[p], pixels[p + 1], pixels[p + 2]], c);
-      maps.height.image.data[h] = ((0.21 * pixels[p] + 0.71 * pixels[p + 1] + 0.07 * pixels[p + 2]) / 0xFF) * (pixels[p + 3] / 0xFF) * scale;
+      if (display === 0 || display === 2) {
+        maps.color.image.data.set([pixels[p], pixels[p + 1], pixels[p + 2]], c);
+      }
+      if (display === 1 || display === 2) {
+        maps.height.image.data[h] = ((0.21 * pixels[p] + 0.71 * pixels[p + 1] + 0.07 * pixels[p + 2]) / 0xFF) * (pixels[p + 3] / 0xFF) * scale;
+      }
     }
     maps.color.needsUpdate = true;
     maps.height.needsUpdate = true;
   }
 
   paint(point, shape, radius, color, blending) {
-    const { maps, material: { map } } = this;
+    const { maps, material: { uniforms: { display: { value: display } } } } = this;
+    const map = display > 0 ? maps.height : maps.color;
     const { image: texture } = map;
     Maps.getBrush(shape, radius).forEach(({ x, y }) => {
       x = Math.floor(point.x * texture.width + x);
@@ -87,7 +99,7 @@ class Maps extends Mesh {
       if (x < 0 || x >= texture.width || y < 0 || y >= texture.height) {
         return;
       }
-      if (map === maps.height) {
+      if (display > 0) {
         const i = y * texture.width + x;
         texture.data[i] = Math.min(Math.max(texture.data[i] + blending, 0), 1);
       } else {
