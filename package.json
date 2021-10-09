@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "build": "rollup -c rollup.config.js",
-    "compile": "sh core/compile.sh",
+    "compile": "sh core/mesher/compile.sh",
     "start": "npm run build -- -w"
   },
   "dependencies": {

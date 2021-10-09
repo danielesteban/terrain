@@ -1,0 +1,3 @@
+[submodule "core/mesher/wasi-libc"]
+	path = core/mesher/wasi-libc
+	url = https://github.com/WebAssembly/wasi-libc.git
