@@ -5,8 +5,6 @@
 
 > A fast heightmap based voxelizer
 
-#### Dev environment
-
 ```bash
 # clone this repo
 git clone https://github.com/danielesteban/terrain.git
