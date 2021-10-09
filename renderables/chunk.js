@@ -39,16 +39,16 @@ class Chunk extends Mesh {
             'uniform vec3 colors[6];',
             'uniform vec4 colorMapOffset;',
             'uniform float height;',
-            'vec2 faceuvs[5] = vec2[5](vec2(0, 0), vec2(0, -0.5), vec2(0, 0.5), vec2(-0.5, 0), vec2(0.5, 0));',
+            'vec2 uvoffset[4] = vec2[4](vec2(0.5, -0.5), vec2(-0.5, -0.5), vec2(-0.5, 0.5), vec2(0.5, 0.5));',
             '#include <common>',
           ].join('\n')
         )
         .replace(
           '#include <uv_vertex>',
           [
-            'int face = int(data) >> 4;',
+            'int corner = int(data) >> 4;',
             'vec3 colorPosition = (modelMatrix * vec4(position, 1.0)).xyz;',
-            'vUv.xy = (colorPosition.xz - colorMapOffset.xy + faceuvs[face]) / colorMapOffset.zw;',
+            'vUv.xy = (colorPosition.xz - colorMapOffset.xy + uvoffset[corner]) / colorMapOffset.zw;',
             'vUv.y = 1.0 - vUv.y;',
           ].join('\n')
         )

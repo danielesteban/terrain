@@ -53,12 +53,11 @@ static void pushFace(
   unsigned int* faces,
   unsigned int* indices,
   unsigned char* vertices,
-  unsigned char face,
   const int chunkX, const int chunkY, const int chunkZ,
-  const int wx1, const int wy1, const int wz1, const unsigned char ao1,
-  const int wx2, const int wy2, const int wz2, const unsigned char ao2,
-  const int wx3, const int wy3, const int wz3, const unsigned char ao3,
-  const int wx4, const int wy4, const int wz4, const unsigned char ao4
+  const int wx1, const int wy1, const int wz1, const unsigned char ao1, const unsigned char c1,
+  const int wx2, const int wy2, const int wz2, const unsigned char ao2, const unsigned char c2,
+  const int wx3, const int wy3, const int wz3, const unsigned char ao3, const unsigned char c3,
+  const int wx4, const int wy4, const int wz4, const unsigned char ao4, const unsigned char c4
 ) {
   const unsigned int  vertex = *faces * 4,
                       indexOffset = *faces * 6,
@@ -80,19 +79,19 @@ static void pushFace(
   vertices[vertexOffset++] = x1;
   vertices[vertexOffset++] = y1;
   vertices[vertexOffset++] = z1;
-  vertices[vertexOffset++] = face << 4 | ao1;
+  vertices[vertexOffset++] = c1 << 4 | ao1;
   vertices[vertexOffset++] = x2;
   vertices[vertexOffset++] = y2;
   vertices[vertexOffset++] = z2;
-  vertices[vertexOffset++] = face << 4 | ao2;
+  vertices[vertexOffset++] = c2 << 4 | ao2;
   vertices[vertexOffset++] = x3;
   vertices[vertexOffset++] = y3;
   vertices[vertexOffset++] = z3;
-  vertices[vertexOffset++] = face << 4 | ao3;
+  vertices[vertexOffset++] = c3 << 4 | ao3;
   vertices[vertexOffset++] = x4;
   vertices[vertexOffset++] = y4;
   vertices[vertexOffset++] = z4;
-  vertices[vertexOffset++] = face << 4 | ao4;
+  vertices[vertexOffset++] = c4 << 4 | ao4;
   indices[indexOffset] = vertex + flipFace;
   indices[indexOffset + 1] = vertex + flipFace + 1;
   indices[indexOffset + 2] = vertex + flipFace + 2;
@@ -159,16 +158,15 @@ const int mesh(
             &faces,
             indices,
             vertices,
-            0,
             chunkX, chunkY, chunkZ,
             x, y + 1, z + 1,
-            getAO(west > y, south > y, southwest > y),
+            getAO(west > y, south > y, southwest > y), 0,
             x + 1, y + 1, z + 1,
-            getAO(east > y, south > y, southeast > y),
+            getAO(east > y, south > y, southeast > y), 1,
             x + 1, y + 1, z,
-            getAO(east > y, north > y, northeast > y),
+            getAO(east > y, north > y, northeast > y), 2,
             x, y + 1, z,
-            getAO(west > y, north > y, northwest > y)
+            getAO(west > y, north > y, northwest > y), 3
           );
         }
         if (y > south) {
@@ -177,16 +175,15 @@ const int mesh(
             &faces,
             indices,
             vertices,
-            1,
             chunkX, chunkY, chunkZ,
             x, y, z + 1,
-            getAO(southwest >= y, south == y - 1, southwest >= y - 1),
+            getAO(southwest >= y, south == y - 1, southwest >= y - 1), 0,
             x + 1, y, z + 1,
-            getAO(southeast >= y, south == y - 1, southeast >= y - 1),
+            getAO(southeast >= y, south == y - 1, southeast >= y - 1), 1,
             x + 1, y + 1, z + 1,
-            getAO(southeast >= y, false, southeast >= y + 1),
+            getAO(southeast >= y, false, southeast >= y + 1), 1,
             x, y + 1, z + 1,
-            getAO(southwest >= y, false, southwest >= y + 1)
+            getAO(southwest >= y, false, southwest >= y + 1), 0
           );
         }
         if (y > north) {
@@ -195,16 +192,15 @@ const int mesh(
             &faces,
             indices,
             vertices,
-            2,
             chunkX, chunkY, chunkZ,
             x + 1, y, z,
-            getAO(northeast >= y, north == y - 1, northeast >= y - 1),
+            getAO(northeast >= y, north == y - 1, northeast >= y - 1), 2,
             x, y, z,
-            getAO(northwest >= y, north == y - 1, northwest >= y - 1),
+            getAO(northwest >= y, north == y - 1, northwest >= y - 1), 3,
             x, y + 1, z,
-            getAO(northwest >= y, false, northwest >= y + 1),
+            getAO(northwest >= y, false, northwest >= y + 1), 3,
             x + 1, y + 1, z,
-            getAO(northeast >= y, false, northeast >= y + 1)
+            getAO(northeast >= y, false, northeast >= y + 1), 2
           );
         }
         if (y > east) {
@@ -213,16 +209,15 @@ const int mesh(
             &faces,
             indices,
             vertices,
-            3,
             chunkX, chunkY, chunkZ,
             x + 1, y, z + 1,
-            getAO(southeast >= y, east == y - 1, southeast >= y - 1),
+            getAO(southeast >= y, east == y - 1, southeast >= y - 1), 1,
             x + 1, y, z,
-            getAO(northeast >= y, east == y - 1, northeast >= y - 1),
+            getAO(northeast >= y, east == y - 1, northeast >= y - 1), 2,
             x + 1, y + 1, z,
-            getAO(northeast >= y, false, northeast >= y + 1),
+            getAO(northeast >= y, false, northeast >= y + 1), 2,
             x + 1, y + 1, z + 1,
-            getAO(southeast >= y, false, southeast >= y + 1)
+            getAO(southeast >= y, false, southeast >= y + 1), 1
           );
         }
         if (y > west) {
@@ -231,16 +226,15 @@ const int mesh(
             &faces,
             indices,
             vertices,
-            4,
             chunkX, chunkY, chunkZ,
             x, y, z,
-            getAO(northwest >= y, west == y - 1, northwest >= y - 1),
+            getAO(northwest >= y, west == y - 1, northwest >= y - 1), 3,
             x, y, z + 1,
-            getAO(southwest >= y, west == y - 1, southwest >= y - 1),
+            getAO(southwest >= y, west == y - 1, southwest >= y - 1), 0,
             x, y + 1, z + 1,
-            getAO(southwest >= y, false, southwest >= y + 1),
+            getAO(southwest >= y, false, southwest >= y + 1), 0,
             x, y + 1, z,
-            getAO(northwest >= y, false, northwest >= y + 1)
+            getAO(northwest >= y, false, northwest >= y + 1), 3
           );
         }
       }
