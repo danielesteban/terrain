@@ -12,7 +12,7 @@ export default ({ editor, mesher, world }) => {
     image.onload = () => {
       URL.revokeObjectURL(url);
       let x, y, width, height;
-      if (image.width / image.height < mesher.width / mesher.depth) {
+      if (image.width / image.height < canvas.width / canvas.height) {
         width = canvas.width;
         height = image.height * width / image.width;
         x = 0;
