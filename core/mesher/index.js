@@ -67,10 +67,10 @@ class Mesher {
       y * chunkHeight,
       z * chunkSize
     );
-    if (faces === 0) {
-      return false;
+    if (faces === -1) {
+      throw new Error('requested chunk is out of bounds');
     }
-    return {
+    return faces === 0 ? false : {
       bounds: new Float32Array(memory.bounds.view),
       indices: new ((faces * 4 - 1) <= 65535 ? Uint16Array : Uint32Array)(
         memory.indices.view.subarray(0, faces * 6)
