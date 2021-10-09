@@ -29,7 +29,6 @@ class World extends Scene {
       width: 0.5,
       height: 1,
     };
-    this.viewport = {};
 
     this.chunks = [];
     const origin = { x: mesher.width * -0.5, z: mesher.depth * -0.5 };

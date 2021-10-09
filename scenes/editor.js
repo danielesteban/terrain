@@ -19,7 +19,6 @@ class Editor extends Scene {
       width: 0.5,
       height: 1,
     };
-    this.viewport = {};
 
     this.brush = {
       enabled: true,

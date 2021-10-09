@@ -28,9 +28,9 @@ class Renderer {
 
     this.views = [];
     this.viewport = {};
+    this.onResize();
 
     window.addEventListener('resize', this.onResize.bind(this), false);
-
     this.renderer.setAnimationLoop(this.onAnimationTick.bind(this));
 
     const mouse = this.mouse = { x: 0, y: 0, primary: false, secondary: false };
@@ -89,6 +89,9 @@ class Renderer {
     const viewport = this.viewport = dom.renderer.getBoundingClientRect();
     renderer.setSize(viewport.width, viewport.height);
     views.forEach((view) => {
+      if (!view.viewport) {
+        view.viewport = {};
+      }
       view.viewport.left = Math.floor(viewport.width * view.screen.left);
       view.viewport.bottom = Math.floor(viewport.height * view.screen.bottom);
       view.viewport.width = Math.floor(viewport.width * view.screen.width);
