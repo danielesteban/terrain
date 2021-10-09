@@ -23,7 +23,6 @@ class World extends Scene {
     this.camera.updateMatrixWorld();
     this.controls = new OrbitControls(this.camera, renderer.renderer.domElement);
     this.controls.enableDamping = true;
-    this.controls.maxPolarAngle = Math.PI * 0.49;
     this.screen = {
       left: 0,
       bottom: 0,
