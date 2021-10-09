@@ -21,7 +21,7 @@ export default ({ world }) => {
           const chunk = new Mesh(new BufferGeometry(), material);
           const vertices = new InterleavedBuffer(new Float32Array(count * 6), 6);
           for (let i = 0, j = 0, l = count * 4; i < l; i += 4, j += 6) {
-            const ao = array[i + 3] / 0xFF;
+            const ao = (array[i + 3] & 0xF) * 0.06;
             vertices.set([
               array[i],
               array[i + 1],

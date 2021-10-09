@@ -5,7 +5,7 @@ import {
   Scene,
   Vector2,
 } from 'three';
-import Heightmap from '../renderables/heightmap.js';
+import Maps from '../renderables/maps.js';
 
 class Editor extends Scene {
   constructor({ mesher, renderer, world }) {
@@ -21,16 +21,33 @@ class Editor extends Scene {
     };
     this.viewport = {};
 
-    this.brush = { enabled: true, shape: 'circle', radius: 31, intensity: 0.75 };
+    this.brush = {
+      enabled: true,
+      shape: 'circle',
+      radius: 31,
+      color: [0xFF, 0xFF, 0xFF],
+      blending: 0.75,
+    };
     this.pointer = new Vector2();
     this.raycaster = new Raycaster();
-    this.texture = new Heightmap(mesher.memory.heightmap.view, mesher.width, mesher.depth);
-    this.add(this.texture);
+    this.maps = new Maps(world.maps);
+    this.add(this.maps);
     this.mouse = renderer.mouse;
     this.world = world;
 
     {
       const dom = document.getElementById('brush');
+      const map = document.createElement('select');
+      map.style.marginRight = '0.5rem';
+      map.style.textTransform = 'capitalize';
+      ['color', 'height'].forEach((value) => {
+        const option = document.createElement('option');
+        option.innerText = value;
+        map.appendChild(option);
+      });
+      map.value = 'height';
+      map.oninput = () => { this.maps.display(map.value); };
+      dom.appendChild(map);
       const shape = document.createElement('select');
       shape.style.marginRight = '0.5rem';
       shape.style.textTransform = 'capitalize';
@@ -42,17 +59,33 @@ class Editor extends Scene {
       shape.oninput = () => { this.brush.shape = shape.value; };
       dom.appendChild(shape);
       const radius = document.createElement('input');
+      radius.style.marginRight = '0.5rem';
       radius.type = 'range';
       radius.min = 1;
       radius.step = 2;
       radius.max = 31;
       radius.oninput = () => { this.brush.radius = parseInt(radius.value, 10); };
       dom.appendChild(radius);
+      const color = document.createElement('input');
+      color.type = 'color';
+      const aux = (new Color()).setRGB(
+        this.brush.color[0] / 0xFF,
+        this.brush.color[1] / 0xFF,
+        this.brush.color[2] / 0xFF
+      );
+      color.value = `#${aux.convertLinearToSRGB().getHexString()}`;
+      color.oninput = () => {
+        aux.set(color.value).convertSRGBToLinear();
+        this.brush.color[0] = Math.floor(aux.r * 0xFF);
+        this.brush.color[1] = Math.floor(aux.g * 0xFF);
+        this.brush.color[2] = Math.floor(aux.b * 0xFF);
+      };
+      dom.appendChild(color);
     }
   }
 
   onAnimationTick(animation) {
-    const { brush, camera, mouse, pointer, raycaster, screen, texture, world } = this;
+    const { brush, camera, maps, mouse, pointer, raycaster, screen, world } = this;
     if (!mouse.primary && !mouse.secondary) {
       brush.enabled = mouse.x > 0.5;
       return;
@@ -64,17 +97,20 @@ class Editor extends Scene {
       .set((mouse.x - screen.left) / screen.width, 1 - ((mouse.y - screen.bottom) / screen.height))
       .multiplyScalar(2).addScalar(-1);
     raycaster.setFromCamera(pointer, camera);
-    const hit = raycaster.intersectObject(texture)[0];
+    const hit = raycaster.intersectObject(maps)[0];
     if (hit) {
-      const uv = texture.worldToLocal(hit.point);
+      const uv = maps.worldToLocal(hit.point);
       uv.y = 1.0 - uv.y;
-      texture.paint(
+      maps.paint(
         uv,
         brush.shape,
         brush.radius,
-        brush.intensity * animation.delta * (mouse.primary ? 1 : -1)
+        brush.color,
+        brush.blending * animation.delta * (mouse.primary ? 1 : -1)
       );
-      world.onUpdate(uv);
+      if (maps.material.map === maps.maps.height) {
+        world.onUpdate(uv);
+      }
     }
   }
 

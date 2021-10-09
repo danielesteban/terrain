@@ -13,9 +13,9 @@ static const unsigned char getAO(
   const bool n3
 ) {
   unsigned char ao = 0;
-  if (n1) ao += 20;
-  if (n2) ao += 20;
-  if ((n1 && n2) || n3) ao += 20;
+  if (n1) ao ++;
+  if (n2) ao ++;
+  if ((n1 && n2) || n3) ao++;
   return ao;
 }
 
@@ -53,6 +53,7 @@ static void pushFace(
   unsigned int* faces,
   unsigned int* indices,
   unsigned char* vertices,
+  unsigned char face,
   const int chunkX, const int chunkY, const int chunkZ,
   const int wx1, const int wy1, const int wz1, const unsigned char ao1,
   const int wx2, const int wy2, const int wz2, const unsigned char ao2,
@@ -76,23 +77,22 @@ static void pushFace(
                       z4 = wz4 - chunkZ;
   unsigned int        vertexOffset = vertex * 4;
   (*faces)++;
-  // Is this crazy? I dunno. You tell me.
   vertices[vertexOffset++] = x1;
   vertices[vertexOffset++] = y1;
   vertices[vertexOffset++] = z1;
-  vertices[vertexOffset++] = ao1;
+  vertices[vertexOffset++] = face << 4 | ao1;
   vertices[vertexOffset++] = x2;
   vertices[vertexOffset++] = y2;
   vertices[vertexOffset++] = z2;
-  vertices[vertexOffset++] = ao2;
+  vertices[vertexOffset++] = face << 4 | ao2;
   vertices[vertexOffset++] = x3;
   vertices[vertexOffset++] = y3;
   vertices[vertexOffset++] = z3;
-  vertices[vertexOffset++] = ao3;
+  vertices[vertexOffset++] = face << 4 | ao3;
   vertices[vertexOffset++] = x4;
   vertices[vertexOffset++] = y4;
   vertices[vertexOffset++] = z4;
-  vertices[vertexOffset++] = ao4;
+  vertices[vertexOffset++] = face << 4 | ao4;
   indices[indexOffset] = vertex + flipFace;
   indices[indexOffset + 1] = vertex + flipFace + 1;
   indices[indexOffset + 2] = vertex + flipFace + 2;
@@ -159,6 +159,7 @@ const int mesh(
             &faces,
             indices,
             vertices,
+            0,
             chunkX, chunkY, chunkZ,
             x, y + 1, z + 1,
             getAO(west > y, south > y, southwest > y),
@@ -176,6 +177,7 @@ const int mesh(
             &faces,
             indices,
             vertices,
+            1,
             chunkX, chunkY, chunkZ,
             x, y, z + 1,
             getAO(southwest >= y, south == y - 1, southwest >= y - 1),
@@ -193,6 +195,7 @@ const int mesh(
             &faces,
             indices,
             vertices,
+            2,
             chunkX, chunkY, chunkZ,
             x + 1, y, z,
             getAO(northeast >= y, north == y - 1, northeast >= y - 1),
@@ -210,6 +213,7 @@ const int mesh(
             &faces,
             indices,
             vertices,
+            3,
             chunkX, chunkY, chunkZ,
             x + 1, y, z + 1,
             getAO(southeast >= y, east == y - 1, southeast >= y - 1),
@@ -227,6 +231,7 @@ const int mesh(
             &faces,
             indices,
             vertices,
+            4,
             chunkX, chunkY, chunkZ,
             x, y, z,
             getAO(northwest >= y, west == y - 1, northwest >= y - 1),

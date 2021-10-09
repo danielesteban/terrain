@@ -26,7 +26,7 @@ const mesher = new Mesher({
     SetupDownloader({ world });
     SetupImageDrop({ editor, mesher, world });
     document.getElementById('smooth').addEventListener('click', () => {
-      editor.texture.blur();
+      editor.maps.blur();
       world.remesh();
     }, false);
   },

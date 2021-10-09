@@ -9,6 +9,7 @@ import {
   ShaderMaterial,
   Sphere,
   UniformsUtils,
+  Vector4,
 } from 'three';
 
 class Chunk extends Mesh {
@@ -27,23 +28,37 @@ class Chunk extends Mesh {
             new Color(0xFFFFFF),
           ],
         },
+        colorMapOffset: { value: new Vector4() },
         height: { value: 0 },
       },
       vertexShader: vertexShader
         .replace(
           '#include <common>',
           [
-            'attribute float ao;',
-            'uniform float height;',
+            'attribute float data;',
             'uniform vec3 colors[6];',
+            'uniform vec4 colorMapOffset;',
+            'uniform float height;',
+            'vec2 faceuvs[5] = vec2[5](vec2(0, 0), vec2(0, -0.5), vec2(0, 0.5), vec2(-0.5, 0), vec2(0.5, 0));',
             '#include <common>',
+          ].join('\n')
+        )
+        .replace(
+          '#include <uv_vertex>',
+          [
+            'int face = int(data) >> 4;',
+            'vec3 colorPosition = (modelMatrix * vec4(position, 1.0)).xyz;',
+            'vUv.xy = (colorPosition.xz - colorMapOffset.xy + faceuvs[face]) / colorMapOffset.zw;',
+            'vUv.y = 1.0 - vUv.y;',
           ].join('\n')
         )
         .replace(
           '#include <color_vertex>',
           [
-            'float colorStep = (modelMatrix * vec4(position, 1.0)).y / height * 5.0;',
-            'vColor.xyz = mix(colors[int(floor(colorStep))], colors[int(ceil(colorStep))], fract(colorStep)) * vec3(1.0 - ao / 255.0);',
+            'float colorStep = colorPosition.y / (height + 1.0) * 5.0;',
+            'vColor.xyz = mix(colors[int(floor(colorStep))], colors[int(ceil(colorStep))], fract(colorStep));',
+            'float ao = float(int(data) & 0xF) * 0.06;',
+            'vColor.xyz *= vec3(1.0 - ao);',
           ].join('\n')
         ),
       fragmentShader,
@@ -79,7 +94,7 @@ class Chunk extends Mesh {
     vertices = new InterleavedBuffer(vertices, 4);
     geometry.setIndex(new BufferAttribute(indices, 1));
     geometry.setAttribute('position', new InterleavedBufferAttribute(vertices, 3, 0));
-    geometry.setAttribute('ao', new InterleavedBufferAttribute(vertices, 1, 3));
+    geometry.setAttribute('data', new InterleavedBufferAttribute(vertices, 1, 3));
     if (geometry.boundingSphere === null) {
       geometry.boundingSphere = new Sphere();
     }

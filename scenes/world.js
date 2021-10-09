@@ -1,4 +1,12 @@
-import { PerspectiveCamera, Scene } from 'three';
+import {
+  DataTexture,
+  FloatType,
+  PerspectiveCamera,
+  Scene,
+  RedFormat,
+  RGBFormat,
+  UnsignedByteType,
+} from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import Chunk from '../renderables/chunk.js';
 
@@ -25,15 +33,15 @@ class World extends Scene {
     this.viewport = {};
 
     this.chunks = [];
-    const origin = { x: mesher.width * 0.5, z: mesher.depth * 0.5 };
+    const origin = { x: mesher.width * -0.5, z: mesher.depth * -0.5 };
     for (let z = 0; z < mesher.chunks.z; z++) {
       for (let x = 0; x < mesher.chunks.x; x++) {
         const subchunks = [];
         for (let y = 0; y < Math.ceil(mesher.height / mesher.chunkHeight); y++) {
           const chunk = new Chunk({
-            x: x * mesher.chunkSize - origin.x,
+            x: origin.x + x * mesher.chunkSize,
             y: y * mesher.chunkHeight,
-            z: z * mesher.chunkSize - origin.z,
+            z: origin.z + z * mesher.chunkSize,
             geometry: mesher.mesh(x, y, z),
           });
           subchunks.push(chunk);
@@ -42,9 +50,30 @@ class World extends Scene {
         this.chunks.push(subchunks);
       }
     }
-    Chunk.material.uniforms.height.value = mesher.height;
+    this.maps = {
+      color: new DataTexture(
+        (new Uint8Array(mesher.width * mesher.depth * 3)).fill(0xFF),
+        mesher.width,
+        mesher.depth,
+        RGBFormat,
+        UnsignedByteType
+      ),
+      height: new DataTexture(
+        mesher.memory.heightmap.view,
+        mesher.width,
+        mesher.depth,
+        RedFormat,
+        FloatType
+      ),
+    };
+    this.maps.color.flipY = this.maps.height.flipY = true;
     this.mesher = mesher;
     this.mouse = renderer.mouse;
+    Chunk.material.map = Chunk.material.uniforms.map.value = this.maps.color;
+    Chunk.material.uniforms.colorMapOffset.value.set(
+      origin.x, origin.z, mesher.width, mesher.depth
+    );
+    Chunk.material.uniforms.height.value = mesher.height;
   }
 
   onAnimationTick() {

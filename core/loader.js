@@ -32,7 +32,7 @@ export default ({ editor, mesher, world }) => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(image, 0, 0, image.width, image.height, x, y, width, height);
         const { data: pixels } = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        editor.texture.load(pixels);
+        editor.maps.load(pixels);
         world.remesh();
       };
       image.onerror = () => {
