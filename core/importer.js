@@ -44,10 +44,10 @@ export default ({ editor, mesher, world }) => {
     e.preventDefault();
     load(e.dataTransfer.files[0]);
   }, false);
-  const uploader = document.getElementById('uploader');
-  uploader.onchange = () => {
-    load(uploader.files[0]);
-    uploader.value = null;
+  const loader = document.getElementById('loader');
+  loader.onchange = () => {
+    load(loader.files[0]);
+    loader.value = null;
   };
-  document.getElementById('browse').addEventListener('click', () => uploader.click(), false);
+  document.getElementById('browse').addEventListener('click', () => loader.click(), false);
 };

@@ -1,6 +1,6 @@
 import SetupColorsUI from './core/colors.js';
-import SetupDownloader from './core/downloader.js';
-import SetupImageDrop from './core/loader.js';
+import SetupExporter from './core/exporter.js';
+import SetupImporter from './core/importer.js';
 import Mesher from './core/mesher/index.js';
 import Renderer from './core/renderer.js';
 import Editor from './scenes/editor.js';
@@ -23,8 +23,8 @@ const mesher = new Mesher({
     renderer.onResize();
 
     SetupColorsUI();
-    SetupDownloader({ world });
-    SetupImageDrop({ editor, mesher, world });
+    SetupExporter({ world });
+    SetupImporter({ editor, mesher, world });
     document.getElementById('smooth').addEventListener('click', () => {
       editor.maps.blur();
       world.remesh();
