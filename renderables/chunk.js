@@ -55,10 +55,9 @@ class Chunk extends Mesh {
         .replace(
           '#include <color_vertex>',
           [
-            'float colorStep = colorPosition.y / (height + 1.0) * 5.0;',
-            'vColor.xyz = mix(colors[int(floor(colorStep))], colors[int(ceil(colorStep))], fract(colorStep));',
             'float ao = float(int(data) & 0xF) * 0.06;',
-            'vColor.xyz *= vec3(1.0 - ao);',
+            'float colorStep = colorPosition.y / (height + 1.0) * 5.0;',
+            'vColor.xyz = mix(colors[int(floor(colorStep))], colors[int(ceil(colorStep))], fract(colorStep)) * vec3(1.0 - ao);',
           ].join('\n')
         ),
       fragmentShader,
