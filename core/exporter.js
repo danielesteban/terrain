@@ -12,12 +12,13 @@ const exporter = new GLTFExporter();
 const uvoffset = [{ x: 0.5, y: -0.5 }, { x: -0.5, y: -0.5 }, { x: -0.5, y: 0.5 }, { x: 0.5, y: 0.5 }];
 
 export default ({ world }) => {
-  const origin = { x: world.mesher.width * -0.5, z: world.mesher.depth * -0.5 };
+  const material = new MeshBasicMaterial({
+    map: world.maps.color,
+    vertexColors: true,
+  });
+  const colors = world.chunks[0][0].material.uniforms.colors.value;
+  const origin = world.chunks[0][0].position;
   document.getElementById('gltf').addEventListener('click', () => {
-    const material = new MeshBasicMaterial({
-      map: world.maps.color,
-      vertexColors: true,
-    });
     exporter.parse(
       world.chunks.reduce((chunks, subchunks) => {
         subchunks.forEach(({ geometry, position, visible }) => {
@@ -29,15 +30,19 @@ export default ({ world }) => {
             const data = array[i + 3];
             const corner = data >> 4;
             const ao = (data & 0xF) * 0.06;
+            const colorStep = (position.y + array[i + 1]) / (world.mesher.height + 1.0) * 5.0;
+            const colorA = colors[Math.floor(colorStep)];
+            const colorB = colors[Math.ceil(colorStep)];
+            const mix = colorStep % 1;
             vertices.set([
               array[i],
               array[i + 1],
               array[i + 2],
-              1.0 - ao,
-              1.0 - ao,
-              1.0 - ao,
+              (colorA.r * (1 - mix) + colorB.r * mix) * (1 - ao),
+              (colorA.g * (1 - mix) + colorB.g * mix) * (1 - ao),
+              (colorA.b * (1 - mix) + colorB.b * mix) * (1 - ao),
               (position.x + array[i] - origin.x + uvoffset[corner].x) / world.mesher.width,
-              1.0 - ((position.z + array[i + 2] - origin.z + uvoffset[corner].y) / world.mesher.depth),
+              1 - ((position.z + array[i + 2] - origin.z + uvoffset[corner].y) / world.mesher.depth),
             ], j);
           }
           chunk.geometry.setIndex(geometry.getIndex());
