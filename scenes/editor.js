@@ -37,9 +37,9 @@ class Editor extends Scene {
 
     {
       let color;
-      const dom = document.getElementById('brush');
+      const editor = document.getElementById('editor');
+      const brush = document.getElementById('brush');
       const map = document.createElement('select');
-      map.style.marginRight = '0.5rem';
       map.style.textTransform = 'capitalize';
       ['color', 'height', 'height+color'].forEach((value) => {
         const option = document.createElement('option');
@@ -51,7 +51,7 @@ class Editor extends Scene {
         this.maps.display(map.value);
         color.style.display = map.value === 'color' ? '' : 'none';
       };
-      dom.appendChild(map);
+      editor.appendChild(map);
       color = document.createElement('input');
       color.style.marginRight = '0.5rem';
       color.style.display = 'none';
@@ -68,7 +68,7 @@ class Editor extends Scene {
         this.brush.color[1] = Math.floor(aux.g * 0xFF);
         this.brush.color[2] = Math.floor(aux.b * 0xFF);
       };
-      dom.appendChild(color);
+      brush.appendChild(color);
       const shape = document.createElement('select');
       shape.style.marginRight = '0.5rem';
       shape.style.textTransform = 'capitalize';
@@ -78,14 +78,14 @@ class Editor extends Scene {
         shape.appendChild(option);
       });
       shape.oninput = () => { this.brush.shape = shape.value; };
-      dom.appendChild(shape);
+      brush.appendChild(shape);
       const radius = document.createElement('input');
       radius.type = 'range';
       radius.min = 1;
       radius.step = 2;
       radius.max = 31;
       radius.oninput = () => { this.brush.radius = parseInt(radius.value, 10); };
-      dom.appendChild(radius);
+      brush.appendChild(radius);
     }
   }
 

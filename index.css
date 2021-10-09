@@ -36,7 +36,7 @@ canvas {
   vertical-align: middle;
 }
 
-#actions {
+#world, #brush {
   position: absolute;
   bottom: 1rem;
   right: 50%;
@@ -45,20 +45,29 @@ canvas {
   align-items: center;
 }
 
-#actions > button {
+#world > button, #brush > button {
   margin-left: 0.5rem;
 }
 
 #brush {
-  position: absolute;
   bottom: 1.4rem;
+  right: 0;
+}
+
+#editor {
+  position: absolute;
+  bottom: 1rem;
   left: 50%;
   padding-left: 1rem;
   display: flex;
   align-items: center;
 }
 
-#downloader {
+#editor > button {
+  margin-right: 0.5rem;
+}
+
+#downloader, #uploader {
   display: none;
 }
 
