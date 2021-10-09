@@ -17,7 +17,7 @@ const mesher = new Mesher({
   depth: 640,
   onLoad: () => {
     const world = new World({ mesher, renderer });
-    const editor = new Editor({ mesher, renderer, world });
+    const editor = new Editor({ renderer, world });
     renderer.views.push(world);
     renderer.views.push(editor);
     renderer.onResize();

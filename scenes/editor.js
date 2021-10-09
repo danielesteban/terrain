@@ -8,7 +8,7 @@ import {
 import Maps from '../renderables/maps.js';
 
 class Editor extends Scene {
-  constructor({ mesher, renderer, world }) {
+  constructor({ renderer, world }) {
     super();
 
     this.background = new Color(0x111111);
