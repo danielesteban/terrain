@@ -5,14 +5,17 @@ import {
 } from 'three';
 
 class Renderer {
-  constructor(dom) {
+  constructor() {
     this.clock = new Clock();
     this.clock.localStartTime = Date.now();
+    this.dom = {
+      fps: document.getElementById('fps'),
+      renderer: document.getElementById('renderer'),
+    };
     this.fps = {
       count: 0,
       lastTick: this.clock.oldTime / 1000,
     };
-    this.dom = dom;
 
     this.renderer = new WebGLRenderer({
       antialias: true,
@@ -22,7 +25,7 @@ class Renderer {
     this.renderer.outputEncoding = sRGBEncoding;
     // this.renderer.setPixelRatio(window.devicePixelRatio || 1);
     this.renderer.setScissorTest(true);
-    dom.renderer.appendChild(this.renderer.domElement);
+    this.dom.renderer.appendChild(this.renderer.domElement);
 
     this.views = [];
     this.viewport = {};
@@ -31,7 +34,7 @@ class Renderer {
     this.renderer.setAnimationLoop(this.onAnimationTick.bind(this));
 
     const mouse = this.mouse = { x: 0, y: 0, primary: false, secondary: false };
-    dom.renderer.addEventListener('mousedown', ({ button }) => {
+    this.dom.renderer.addEventListener('mousedown', ({ button }) => {
       button === 0 && (mouse.primary = true);
       button === 2 && (mouse.secondary = true);
     });
