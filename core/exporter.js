@@ -33,8 +33,8 @@ export default ({ world }) => {
           const vertices = new InterleavedBuffer(new Float32Array(count * 8), 8);
           for (let i = 0, j = 0, l = count * 4; i < l; i += 4, j += 8) {
             const data = array[i + 3];
-            const corner = data >> 4;
             const ao = (data & 0xF) * 0.1;
+            const corner = data >> 4;
             let r, g, b;
             r = g = b = (aoEnabled.value ? (1 - ao) : 1);
             if (colorsEnabled.value) {
