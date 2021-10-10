@@ -93,12 +93,12 @@ class Editor extends Scene {
     const editor = document.getElementById('editor');
     const map = document.createElement('select');
     map.style.textTransform = 'capitalize';
-    ['color', 'height', 'height+color'].forEach((value) => {
+    ['color', 'height', 'color*height'].forEach((value) => {
       const option = document.createElement('option');
       option.innerText = value;
       map.appendChild(option);
     });
-    map.value = 'height+color';
+    map.value = 'color*height';
     map.oninput = () => {
       this.maps.display(map.value);
       color.style.display = map.value === 'color' ? '' : 'none';

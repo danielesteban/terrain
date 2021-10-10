@@ -61,7 +61,7 @@ class Maps extends Mesh {
     );
     this.matrixAutoUpdate = false;
     this.maps = maps;
-    this.display('height+color');
+    this.display('color*height');
   }
 
   blur(radius = 1) {
@@ -72,7 +72,7 @@ class Maps extends Mesh {
   
   display(map) {
     const { material } = this;
-    material.uniforms.display.value = ['color', 'height', 'height+color'].indexOf(map);
+    material.uniforms.display.value = ['color', 'height', 'color*height'].indexOf(map);
   }
 
   load(pixels, scale = 1) {
