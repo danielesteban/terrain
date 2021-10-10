@@ -13,6 +13,7 @@ body {
   font-size: 0.8rem;
   font-weight: 400;
   line-height: 1rem;
+  text-shadow: rgba(0, 0, 0, .4) 0 0 4px;
 }
 
 button {
@@ -28,7 +29,6 @@ button {
   text-decoration: none;
   cursor: pointer;
   font-family: inherit;
-  text-decoration: none;
   text-shadow: rgba(0, 0, 0, .4) 1px 2px;
 }
 
@@ -47,6 +47,11 @@ canvas {
 
 #world > button, #brush > button {
   margin-left: 0.5rem;
+}
+
+#world > div {
+  display: flex;
+  align-items: center;
 }
 
 #brush {
