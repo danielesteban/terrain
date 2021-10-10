@@ -54,7 +54,7 @@ export default ({ world }) => {
               g,
               b,
               (position.x + array[i] - colorMapOffset.x + uvoffset[corner].x) / colorMapOffset.z,
-              1 - ((position.z + array[i + 2] - colorMapOffset.y + uvoffset[corner].y) / colorMapOffset.w),
+              (position.z + array[i + 2] - colorMapOffset.y + uvoffset[corner].y) / colorMapOffset.w,
             ], j);
           }
           const chunk = new Mesh(new BufferGeometry(), material);
