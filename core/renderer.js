@@ -1,5 +1,4 @@
 import {
-  ACESFilmicToneMapping,
   Clock,
   sRGBEncoding,
   WebGLRenderer,
@@ -21,7 +20,6 @@ class Renderer {
       powerPreference: 'high-performance',
     });
     this.renderer.outputEncoding = sRGBEncoding;
-    this.renderer.toneMapping = ACESFilmicToneMapping;
     // this.renderer.setPixelRatio(window.devicePixelRatio || 1);
     this.renderer.setScissorTest(true);
     dom.renderer.appendChild(this.renderer.domElement);
