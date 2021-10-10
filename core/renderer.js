@@ -26,7 +26,6 @@ class Renderer {
 
     this.views = [];
     this.viewport = {};
-    this.onResize();
 
     window.addEventListener('resize', this.onResize.bind(this), false);
     this.renderer.setAnimationLoop(this.onAnimationTick.bind(this));
