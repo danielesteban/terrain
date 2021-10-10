@@ -60,9 +60,7 @@ export default ({ world }) => {
           }
           chunk.geometry.setIndex(geometry.getIndex());
           chunk.geometry.setAttribute('position', new InterleavedBufferAttribute(vertices, 3, 0));
-          if (aoEnabled.value || colorsEnabled.value) {
-            chunk.geometry.setAttribute('color', new InterleavedBufferAttribute(vertices, 3, 3));
-          }
+          chunk.geometry.setAttribute('color', new InterleavedBufferAttribute(vertices, 3, 3));
           chunk.geometry.setAttribute('uv', new InterleavedBufferAttribute(vertices, 2, 6));
           chunk.position.copy(position);
           chunks.push(chunk);
