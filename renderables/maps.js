@@ -35,8 +35,8 @@ class Maps extends Mesh {
         .replace(
           '#include <map_fragment>',
           [
-            'vec3 texelColor = mapTexelToLinear(texture2D( map, vUv )).xyz;',
-            'vec3 texelHeight = mapTexelToLinear(texture2D( heightmap, vUv )).xxx;',
+            'vec3 texelColor = mapTexelToLinear(texture2D(map, vUv)).xyz;',
+            'vec3 texelHeight = texture2D(heightmap, vUv).xxx;',
             'if (display == 0) diffuseColor.xyz *= texelColor;',
             'else if (display == 1) diffuseColor.xyz *= texelHeight;',
             'else if (display == 2) diffuseColor.xyz *= texelColor * texelHeight;',

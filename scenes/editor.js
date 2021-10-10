@@ -115,9 +115,9 @@ class Editor extends Scene {
       this.brush.color[1] / 0xFF,
       this.brush.color[2] / 0xFF
     );
-    color.value = `#${aux.convertLinearToSRGB().getHexString()}`;
+    color.value = `#${aux.getHexString()}`;
     color.oninput = () => {
-      aux.set(color.value).convertSRGBToLinear();
+      aux.set(color.value);
       this.brush.color[0] = Math.floor(aux.r * 0xFF);
       this.brush.color[1] = Math.floor(aux.g * 0xFF);
       this.brush.color[2] = Math.floor(aux.b * 0xFF);

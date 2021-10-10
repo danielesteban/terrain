@@ -2,9 +2,10 @@ import {
   DataTexture,
   FloatType,
   PerspectiveCamera,
-  Scene,
   RedFormat,
   RGBFormat,
+  Scene,
+  sRGBEncoding,
   UnsignedByteType,
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -64,6 +65,7 @@ class World extends Scene {
         FloatType
       ),
     };
+    this.maps.color.encoding = sRGBEncoding;
     this.maps.color.flipY = this.maps.height.flipY = true;
     this.mesher = mesher;
     this.mouse = renderer.mouse;
