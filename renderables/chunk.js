@@ -19,14 +19,7 @@ class Chunk extends Mesh {
       uniforms: {
         ...UniformsUtils.clone(uniforms),
         colors: {
-          value: [
-            new Color(0),
-            new Color(0x333333),
-            new Color(0x666666),
-            new Color(0x999999),
-            new Color(0xBBBBBB),
-            new Color(0xFFFFFF),
-          ],
+          value: [...Array(6)].map((v, i) => (new Color()).setScalar(i / 5)),
         },
         colorMapOffset: { value: new Vector4() },
         height: { value: 0 },
