@@ -73,7 +73,7 @@ class World extends Scene {
     Chunk.material.uniforms.colorMapOffset.value.set(
       origin.x, origin.z, mesher.width, mesher.depth
     );
-    Chunk.material.uniforms.height.value = mesher.height;
+    Chunk.material.uniforms.colorsHeight.value = mesher.height + 1;
   }
 
   onAnimationTick() {

@@ -21,8 +21,9 @@ class Chunk extends Mesh {
         colors: {
           value: [...Array(6)].map((v, i) => (new Color()).setScalar(i / 5)),
         },
+        colorsEnabled: { value: true },
+        colorsHeight: { value: 0 },
         colorMapOffset: { value: new Vector4() },
-        height: { value: 0 },
       },
       vertexShader: vertexShader
         .replace(
@@ -30,8 +31,9 @@ class Chunk extends Mesh {
           [
             'attribute float data;',
             'uniform vec3 colors[6];',
+            'uniform bool colorsEnabled;',
+            'uniform float colorsHeight;',
             'uniform vec4 colorMapOffset;',
-            'uniform float height;',
             'vec2 uvoffset[4] = vec2[4](vec2(0.5, -0.5), vec2(-0.5, -0.5), vec2(-0.5, 0.5), vec2(0.5, 0.5));',
             '#include <common>',
           ].join('\n')
@@ -48,9 +50,12 @@ class Chunk extends Mesh {
         .replace(
           '#include <color_vertex>',
           [
-            'float ao = float(int(data) & 0xF) * 0.06;',
-            'float colorStep = colorPosition.y / (height + 1.0) * 5.0;',
-            'vColor.xyz = mix(colors[int(floor(colorStep))], colors[int(ceil(colorStep))], fract(colorStep)) * vec3(1.0 - ao);',
+            'float ao = float(int(data) & 0xF) * 0.1;',
+            'vColor.xyz = vec3(1.0 - ao);',
+            'if (colorsEnabled) {',
+            '  float colorStep = colorPosition.y / colorsHeight * 5.0;',
+            '  vColor.xyz *= mix(colors[int(floor(colorStep))], colors[int(ceil(colorStep))], fract(colorStep));',
+            '}',
           ].join('\n')
         ),
       fragmentShader,

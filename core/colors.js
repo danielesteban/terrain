@@ -5,8 +5,18 @@ export default () => {
   if (!Chunk.material) {
     Chunk.setupMaterial();
   }
-  const { uniforms: { colors: { value: colors } } } = Chunk.material;
+  const { uniforms: { colors: { value: colors }, colorsEnabled } } = Chunk.material;
   const dom = document.getElementById('colors');
+  {
+    const input = document.createElement('input');
+    input.style.marginRight = '0.5rem';
+    input.type = 'checkbox';
+    input.checked = colorsEnabled.value;
+    input.onchange = () => {
+      colorsEnabled.value = input.checked;
+    };
+    dom.appendChild(input);
+  }
   const aux = new Color();
   colors.forEach((color) => {
     const input = document.createElement('input');
