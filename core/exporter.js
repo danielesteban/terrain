@@ -6,19 +6,24 @@ import {
   MeshStandardMaterial,
 } from 'three';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
+import Chunk from '../renderables/chunk.js';
 
 const downloader = document.getElementById('downloader');
 const exporter = new GLTFExporter();
 const uvoffset = [{ x: 0.5, y: -0.5 }, { x: -0.5, y: -0.5 }, { x: -0.5, y: 0.5 }, { x: 0.5, y: 0.5 }];
 
 export default ({ world }) => {
+  const {
+    aoEnabled,
+    colors: { value: colors },
+    colorsEnabled,
+    colorsHeight: { value: colorsHeight },
+    colorMapOffset: { value: colorMapOffset },
+  } = Chunk.material.uniforms;
   const material = new MeshStandardMaterial({
     map: world.maps.color,
     vertexColors: true,
   });
-  const colors = world.chunks[0][0].material.uniforms.colors.value;
-  const colorsEnabled = world.chunks[0][0].material.uniforms.colorsEnabled;
-  const origin = world.chunks[0][0].position;
   document.getElementById('gltf').addEventListener('click', () => {
     exporter.parse(
       world.chunks.reduce((chunks, subchunks) => {
@@ -32,9 +37,9 @@ export default ({ world }) => {
             const corner = data >> 4;
             const ao = (data & 0xF) * 0.1;
             let r, g, b;
-            r = g = b = 1 - ao;
+            r = g = b = (aoEnabled.value ? (1 - ao) : 1);
             if (colorsEnabled.value) {
-              const colorStep = (position.y + array[i + 1]) / (world.mesher.height + 1.0) * 5.0;
+              const colorStep = (position.y + array[i + 1]) / colorsHeight * 5;
               const colorA = colors[Math.floor(colorStep)];
               const colorB = colors[Math.ceil(colorStep)];
               const mix = colorStep % 1;
@@ -49,13 +54,15 @@ export default ({ world }) => {
               r,
               g,
               b,
-              (position.x + array[i] - origin.x + uvoffset[corner].x) / world.mesher.width,
-              1 - ((position.z + array[i + 2] - origin.z + uvoffset[corner].y) / world.mesher.depth),
+              (position.x + array[i] - colorMapOffset.x + uvoffset[corner].x) / colorMapOffset.z,
+              1 - ((position.z + array[i + 2] - colorMapOffset.z + uvoffset[corner].y) / colorMapOffset.w),
             ], j);
           }
           chunk.geometry.setIndex(geometry.getIndex());
           chunk.geometry.setAttribute('position', new InterleavedBufferAttribute(vertices, 3, 0));
-          chunk.geometry.setAttribute('color', new InterleavedBufferAttribute(vertices, 3, 3));
+          if (aoEnabled.value || colorsEnabled.value) {
+            chunk.geometry.setAttribute('color', new InterleavedBufferAttribute(vertices, 3, 3));
+          }
           chunk.geometry.setAttribute('uv', new InterleavedBufferAttribute(vertices, 2, 6));
           chunk.position.copy(position);
           chunks.push(chunk);

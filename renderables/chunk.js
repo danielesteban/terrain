@@ -18,6 +18,7 @@ class Chunk extends Mesh {
     Chunk.material = new ShaderMaterial({
       uniforms: {
         ...UniformsUtils.clone(uniforms),
+        aoEnabled: { value: true },
         colors: {
           value: [...Array(6)].map((v, i) => (new Color()).setScalar(i / 5)),
         },
@@ -31,6 +32,7 @@ class Chunk extends Mesh {
           [
             'attribute float data;',
             'uniform vec3 colors[6];',
+            'uniform bool aoEnabled;',
             'uniform bool colorsEnabled;',
             'uniform float colorsHeight;',
             'uniform vec4 colorMapOffset;',
@@ -51,7 +53,7 @@ class Chunk extends Mesh {
           '#include <color_vertex>',
           [
             'float ao = float(int(data) & 0xF) * 0.1;',
-            'vColor.xyz = vec3(1.0 - ao);',
+            'vColor.xyz = vec3(aoEnabled ? (1.0 - ao) : 1.0);',
             'if (colorsEnabled) {',
             '  float colorStep = colorPosition.y / colorsHeight * 5.0;',
             '  vColor.xyz *= mix(colors[int(floor(colorStep))], colors[int(ceil(colorStep))], fract(colorStep));',

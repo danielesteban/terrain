@@ -2,10 +2,7 @@ import { Color } from 'three';
 import Chunk from '../renderables/chunk.js';
 
 export default () => {
-  if (!Chunk.material) {
-    Chunk.setupMaterial();
-  }
-  const { uniforms: { colors: { value: colors }, colorsEnabled } } = Chunk.material;
+  const { uniforms: { aoEnabled, colors: { value: colors }, colorsEnabled } } = Chunk.material;
   const dom = document.getElementById('colors');
   {
     const input = document.createElement('input');
@@ -27,4 +24,21 @@ export default () => {
     };
     dom.appendChild(input);
   });
+  {
+    const label = document.createElement('label');
+    label.style.display = 'flex';
+    label.style.alignItems = 'center';
+    label.style.marginRight = '0.5rem';
+    const input = document.createElement('input');
+    input.style.marginLeft = '1rem';
+    input.style.marginRight = '0.5rem';
+    input.type = 'checkbox';
+    input.checked = aoEnabled.value;
+    input.onchange = () => {
+      aoEnabled.value = input.checked;
+    };
+    label.appendChild(input);
+    label.appendChild(document.createTextNode('AO'));
+    dom.appendChild(label);
+  }
 };
