@@ -60,8 +60,9 @@ static void pushFace(
   const int wx4, const int wy4, const int wz4, const unsigned char ao4, const unsigned char c4
 ) {
   const unsigned int  vertex = *faces * 4,
-                      indexOffset = *faces * 6,
-                      flipFace = ((int) ao1 + ao3) > ((int) ao2 + ao4) ? 1 : 0; // Fixes interpolation anisotropy
+                      flipFace = (ao1 + ao3) > (ao2 + ao4) ? 1 : 0; // Fixes interpolation anisotropy
+  unsigned int        indexOffset = *faces * 6,
+                      vertexOffset = vertex * 4;
   const unsigned char x1 = wx1 - chunkX,
                       y1 = wy1 - chunkY,
                       z1 = wz1 - chunkZ,
@@ -74,7 +75,6 @@ static void pushFace(
                       x4 = wx4 - chunkX,
                       y4 = wy4 - chunkY,
                       z4 = wz4 - chunkZ;
-  unsigned int        vertexOffset = vertex * 4;
   (*faces)++;
   vertices[vertexOffset++] = x1;
   vertices[vertexOffset++] = y1;
@@ -92,12 +92,12 @@ static void pushFace(
   vertices[vertexOffset++] = y4;
   vertices[vertexOffset++] = z4;
   vertices[vertexOffset++] = c4 << 4 | ao4;
-  indices[indexOffset] = vertex + flipFace;
-  indices[indexOffset + 1] = vertex + flipFace + 1;
-  indices[indexOffset + 2] = vertex + flipFace + 2;
-  indices[indexOffset + 3] = vertex + flipFace + 2;
-  indices[indexOffset + 4] = vertex + ((flipFace + 3) % 4);
-  indices[indexOffset + 5] = vertex + flipFace;
+  indices[indexOffset++] = vertex + flipFace;
+  indices[indexOffset++] = vertex + flipFace + 1;
+  indices[indexOffset++] = vertex + flipFace + 2;
+  indices[indexOffset++] = vertex + flipFace + 2;
+  indices[indexOffset++] = vertex + ((flipFace + 3) % 4);
+  indices[indexOffset++] = vertex + flipFace;
   growBox(box, x1, y1, z1);
   growBox(box, x2, y2, z2);
   growBox(box, x3, y3, z3);
