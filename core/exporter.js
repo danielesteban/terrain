@@ -30,7 +30,6 @@ export default ({ world }) => {
         subchunks.forEach(({ geometry, position, visible }) => {
           if (!visible) return;
           const { data: { array, count } } = geometry.getAttribute('position');
-          const chunk = new Mesh(new BufferGeometry(), material);
           const vertices = new InterleavedBuffer(new Float32Array(count * 8), 8);
           for (let i = 0, j = 0, l = count * 4; i < l; i += 4, j += 8) {
             const data = array[i + 3];
@@ -58,6 +57,7 @@ export default ({ world }) => {
               1 - ((position.z + array[i + 2] - colorMapOffset.z + uvoffset[corner].y) / colorMapOffset.w),
             ], j);
           }
+          const chunk = new Mesh(new BufferGeometry(), material);
           chunk.geometry.setIndex(geometry.getIndex());
           chunk.geometry.setAttribute('position', new InterleavedBufferAttribute(vertices, 3, 0));
           chunk.geometry.setAttribute('color', new InterleavedBufferAttribute(vertices, 3, 3));
