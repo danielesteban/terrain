@@ -16,7 +16,6 @@ const mesher = new Mesher({
     const editor = new Editor({ world });
     renderer.views.push(world);
     renderer.views.push(editor);
-    renderer.onResize();
 
     SetupColorsUI();
     SetupExporter({ world });

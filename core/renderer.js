@@ -30,6 +30,7 @@ class Renderer {
     this.views = [];
     this.viewport = {};
 
+    requestAnimationFrame(this.onResize.bind(this));
     window.addEventListener('resize', this.onResize.bind(this), false);
     this.renderer.setAnimationLoop(this.onAnimationTick.bind(this));
 
