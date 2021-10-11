@@ -8,7 +8,7 @@ import {
 import Maps from '../renderables/maps.js';
 
 class Editor extends Scene {
-  constructor({ renderer, world }) {
+  constructor({ world }) {
     super();
 
     this.background = new Color(0x111111);
@@ -31,14 +31,13 @@ class Editor extends Scene {
     this.raycaster = new Raycaster();
     this.maps = new Maps(world.maps);
     this.add(this.maps);
-    this.mouse = renderer.mouse;
     this.world = world;
 
     this.setupUI();
   }
 
-  onAnimationTick(animation) {
-    const { brush, camera, maps, mouse, pointer, raycaster, screen, world } = this;
+  onAnimationTick({ delta, mouse }) {
+    const { brush, camera, maps, pointer, raycaster, screen, world } = this;
     if (!mouse.primary && !mouse.secondary) {
       brush.enabled = mouse.x > 0.5;
       return;
@@ -59,7 +58,7 @@ class Editor extends Scene {
         brush.shape,
         brush.radius,
         brush.color,
-        brush.blending * animation.delta * (mouse.primary ? 1 : -1)
+        brush.blending * delta * (mouse.primary ? 1 : -1)
       );
       if (maps.material.uniforms.display.value > 0) {
         world.onUpdate(uv);

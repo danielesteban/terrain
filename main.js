@@ -13,7 +13,7 @@ const mesher = new Mesher({
   onLoad: () => {
     const renderer = new Renderer();
     const world = new World({ mesher, renderer });
-    const editor = new Editor({ renderer, world });
+    const editor = new Editor({ world });
     renderer.views.push(world);
     renderer.views.push(editor);
     renderer.onResize();

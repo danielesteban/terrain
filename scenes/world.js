@@ -68,7 +68,6 @@ class World extends Scene {
     this.maps.color.encoding = sRGBEncoding;
     this.maps.color.flipY = this.maps.height.flipY = true;
     this.mesher = mesher;
-    this.mouse = renderer.mouse;
     Chunk.material.map = Chunk.material.uniforms.map.value = this.maps.color;
     Chunk.material.uniforms.colorMapOffset.value.set(
       origin.x, origin.z, mesher.width, mesher.depth
@@ -76,8 +75,8 @@ class World extends Scene {
     Chunk.material.uniforms.colorsHeight.value = mesher.height + 1;
   }
 
-  onAnimationTick() {
-    const { controls, mouse } = this;
+  onAnimationTick({ mouse }) {
+    const { controls } = this;
     if (!mouse.primary && !mouse.secondary) {
       controls.enabled = mouse.x < 0.5;
     }
