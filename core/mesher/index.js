@@ -5,7 +5,7 @@ class Mesher {
     width,
     height,
     depth,
-    chunkHeight = 0x40,
+    chunkHeight = 0x80,
     chunkSize = 0x20,
     onLoad,
   }) {
