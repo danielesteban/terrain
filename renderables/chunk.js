@@ -19,6 +19,7 @@ class Chunk extends Mesh {
       uniforms: {
         ...UniformsUtils.clone(uniforms),
         aoEnabled: { value: true },
+        aoIntensity: { value: 0.05 },
         colors: {
           value: [...Array(6)].map((v, i) => (new Color()).setScalar(i / 5)),
         },
@@ -33,10 +34,11 @@ class Chunk extends Mesh {
             'attribute float data;',
             'uniform vec3 colors[6];',
             'uniform bool aoEnabled;',
+            'uniform float aoIntensity;',
             'uniform bool colorsEnabled;',
             'uniform vec3 colorMapOffset;',
             'uniform vec3 colorMapSize;',
-            'vec2 uvoffset[4] = vec2[4](vec2(0.5, -0.5), vec2(-0.5, -0.5), vec2(-0.5, 0.5), vec2(0.5, 0.5));',
+            'const vec2 uvoffset[4] = vec2[4](vec2(0.5, -0.5), vec2(-0.5, -0.5), vec2(-0.5, 0.5), vec2(0.5, 0.5));',
             '#include <common>',
           ].join('\n')
         )
@@ -53,7 +55,7 @@ class Chunk extends Mesh {
           [
             'vColor.xyz = vec3(1.0);',
             'if (aoEnabled) {',
-            '  float ao = float(int(data) & 0xF) * 0.1;',
+            '  float ao = float(int(data) & 0xF) * aoIntensity;',
             '  vColor.xyz -= ao;',
             '}',
             'if (colorsEnabled) {',

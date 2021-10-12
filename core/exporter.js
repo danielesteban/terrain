@@ -14,6 +14,7 @@ const uvoffset = [{ x: 0.5, y: -0.5 }, { x: -0.5, y: -0.5 }, { x: -0.5, y: 0.5 }
 export default ({ world }) => {
   const {
     aoEnabled,
+    aoIntensity,
     colors: { value: colors },
     colorsEnabled,
     colorMapSize: { value: colorMapSize },
@@ -31,7 +32,7 @@ export default ({ world }) => {
           const vertices = new InterleavedBuffer(new Float32Array(count * 8), 8);
           for (let i = 0, j = 0, l = count * 4; i < l; i += 4, j += 8) {
             const data = array[i + 3];
-            const ao = (data & 0xF) * 0.1;
+            const ao = (data & 0xF) * aoIntensity.value;
             const corner = data >> 4;
             let r, g, b;
             r = g = b = (aoEnabled.value ? (1 - ao) : 1);
