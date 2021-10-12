@@ -9,13 +9,13 @@ import {
   ShaderMaterial,
   Sphere,
   UniformsUtils,
-  Vector4,
+  Vector3,
 } from 'three';
 
 class Chunk extends Mesh {
-  static setupMaterial() {
+  static getMaterial() {
     const { uniforms, vertexShader, fragmentShader } = ShaderLib.basic;
-    Chunk.material = new ShaderMaterial({
+    return new ShaderMaterial({
       uniforms: {
         ...UniformsUtils.clone(uniforms),
         aoEnabled: { value: true },
@@ -23,8 +23,8 @@ class Chunk extends Mesh {
           value: [...Array(6)].map((v, i) => (new Color()).setScalar(i / 5)),
         },
         colorsEnabled: { value: true },
-        colorsHeight: { value: 0 },
-        colorMapOffset: { value: new Vector4() },
+        colorMapOffset: { value: new Vector3() },
+        colorMapSize: { value: new Vector3() },
       },
       vertexShader: vertexShader
         .replace(
@@ -34,8 +34,8 @@ class Chunk extends Mesh {
             'uniform vec3 colors[6];',
             'uniform bool aoEnabled;',
             'uniform bool colorsEnabled;',
-            'uniform float colorsHeight;',
-            'uniform vec4 colorMapOffset;',
+            'uniform vec3 colorMapOffset;',
+            'uniform vec3 colorMapSize;',
             'vec2 uvoffset[4] = vec2[4](vec2(0.5, -0.5), vec2(-0.5, -0.5), vec2(-0.5, 0.5), vec2(0.5, 0.5));',
             '#include <common>',
           ].join('\n')
@@ -44,18 +44,20 @@ class Chunk extends Mesh {
           '#include <uv_vertex>',
           [
             'int corner = int(data) >> 4;',
-            'vec3 colorPosition = (modelMatrix * vec4(position, 1.0)).xyz;',
-            'vUv.xy = (colorPosition.xz - colorMapOffset.xy + uvoffset[corner]) / colorMapOffset.zw;',
+            'vUv.xy = (position.xz + colorMapOffset.xz + uvoffset[corner]) / colorMapSize.xz;',
             'vUv.y = 1.0 - vUv.y;',
           ].join('\n')
         )
         .replace(
           '#include <color_vertex>',
           [
-            'float ao = float(int(data) & 0xF) * 0.1;',
-            'vColor.xyz = vec3(aoEnabled ? (1.0 - ao) : 1.0);',
+            'vColor.xyz = vec3(1.0);',
+            'if (aoEnabled) {',
+            '  float ao = float(int(data) & 0xF) * 0.1;',
+            '  vColor.xyz -= ao;',
+            '}',
             'if (colorsEnabled) {',
-            '  float colorStep = colorPosition.y / colorsHeight * 5.0;',
+            '  float colorStep = (position.y + colorMapOffset.y) / colorMapSize.y * 5.0;',
             '  vColor.xyz *= mix(colors[int(floor(colorStep))], colors[int(ceil(colorStep))], fract(colorStep));',
             '}',
           ].join('\n')
@@ -68,13 +70,13 @@ class Chunk extends Mesh {
   constructor({
     x, y, z,
     geometry,
+    material,
+    origin,
   }) {
-    if (!Chunk.material) {
-      Chunk.setupMaterial();
-    }
-    super(new BufferGeometry(), Chunk.material);
+    super(new BufferGeometry(), material);
     this.update(geometry);
-    this.position.set(x, y, z);
+    this.colorMapOffset = new Vector3(x, y, z);
+    this.position.set(origin.x + x, y, origin.z + z);
     this.updateMatrixWorld();
     this.matrixAutoUpdate = false;
   }
@@ -82,6 +84,12 @@ class Chunk extends Mesh {
   dispose() {
     const { geometry } = this;
     geometry.dispose();
+  }
+
+  onBeforeRender() {
+    const { colorMapOffset, material } = this;
+    material.uniforms.colorMapOffset.value.copy(colorMapOffset);
+    material.uniformsNeedUpdate = true;
   }
 
   update({ bounds, indices, vertices } = {}) {

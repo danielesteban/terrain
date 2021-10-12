@@ -1,8 +1,7 @@
 import { Color } from 'three';
-import Chunk from '../renderables/chunk.js';
 
-export default () => {
-  const { uniforms: { aoEnabled, colors: { value: colors }, colorsEnabled } } = Chunk.material;
+export default ({ world }) => {
+  const { uniforms: { aoEnabled, colors: { value: colors }, colorsEnabled } } = world.material;
   const dom = document.getElementById('colors');
   {
     const input = document.createElement('input');

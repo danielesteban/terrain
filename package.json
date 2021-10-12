@@ -5,6 +5,7 @@
   "scripts": {
     "build": "rollup -c rollup.config.js",
     "compile": "sh core/mesher/compile.sh",
+    "package": "rollup -c package/rollup.config.js",
     "start": "npm run build -- -w"
   },
   "dependencies": {

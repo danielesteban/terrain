@@ -75,20 +75,6 @@ class Maps extends Mesh {
     material.uniforms.display.value = ['color', 'height', 'color*height'].indexOf(map);
   }
 
-  load(pixels, scale = 1) {
-    const { maps, material: { uniforms: { display: { value: display } } } } = this;
-    for (let p = 0, c = 0, h = 0, l = pixels.length; p < l; p += 4, c += 3, h++) {
-      if (display === 0 || display === 2) {
-        maps.color.image.data.set([pixels[p], pixels[p + 1], pixels[p + 2]], c);
-      }
-      if (display === 1 || display === 2) {
-        maps.height.image.data[h] = ((0.21 * pixels[p] + 0.71 * pixels[p + 1] + 0.07 * pixels[p + 2]) / 0xFF) * (pixels[p + 3] / 0xFF) * scale;
-      }
-    }
-    maps.color.needsUpdate = true;
-    maps.height.needsUpdate = true;
-  }
-
   paint(point, shape, radius, color, blending) {
     const { maps, material: { uniforms: { display: { value: display } } } } = this;
     const map = display > 0 ? maps.height : maps.color;

@@ -6,7 +6,6 @@ import {
   MeshStandardMaterial,
 } from 'three';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
-import Chunk from '../renderables/chunk.js';
 
 const downloader = document.getElementById('downloader');
 const exporter = new GLTFExporter();
@@ -17,9 +16,8 @@ export default ({ world }) => {
     aoEnabled,
     colors: { value: colors },
     colorsEnabled,
-    colorsHeight: { value: colorsHeight },
-    colorMapOffset: { value: colorMapOffset },
-  } = Chunk.material.uniforms;
+    colorMapSize: { value: colorMapSize },
+  } = world.material.uniforms;
   const material = new MeshStandardMaterial({
     map: world.maps.color,
     vertexColors: true,
@@ -27,7 +25,7 @@ export default ({ world }) => {
   document.getElementById('gltf').addEventListener('click', () => {
     exporter.parse(
       world.chunks.reduce((chunks, subchunks) => {
-        subchunks.forEach(({ geometry, position, visible }) => {
+        subchunks.forEach(({ colorMapOffset, geometry, position, visible }) => {
           if (!visible) return;
           const { data: { array, count } } = geometry.getAttribute('position');
           const vertices = new InterleavedBuffer(new Float32Array(count * 8), 8);
@@ -38,7 +36,7 @@ export default ({ world }) => {
             let r, g, b;
             r = g = b = (aoEnabled.value ? (1 - ao) : 1);
             if (colorsEnabled.value) {
-              const colorStep = (position.y + array[i + 1]) / colorsHeight * 5;
+              const colorStep = (array[i + 1] + colorMapOffset.y) / colorMapSize.y * 5;
               const colorA = colors[Math.floor(colorStep)];
               const colorB = colors[Math.ceil(colorStep)];
               const mix = colorStep % 1;
@@ -53,8 +51,8 @@ export default ({ world }) => {
               r,
               g,
               b,
-              (position.x + array[i] - colorMapOffset.x + uvoffset[corner].x) / colorMapOffset.z,
-              (position.z + array[i + 2] - colorMapOffset.y + uvoffset[corner].y) / colorMapOffset.w,
+              (array[i] + colorMapOffset.x + uvoffset[corner].x) / colorMapSize.x,
+              (array[i + 2] + colorMapOffset.z + uvoffset[corner].y) / colorMapSize.z,
             ], j);
           }
           const chunk = new Mesh(new BufferGeometry(), material);

@@ -1,2 +1,4 @@
 dist
+package/package.json
+package/terrain.js
 node_modules

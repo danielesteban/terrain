@@ -61,7 +61,7 @@ class Editor extends Scene {
         brush.blending * delta * (mouse.primary ? 1 : -1)
       );
       if (maps.material.uniforms.display.value > 0) {
-        world.onUpdate(uv);
+        world.remesh(uv);
       }
     }
   }
