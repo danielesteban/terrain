@@ -166,9 +166,9 @@ class World extends Group {
             ].includes(map)
           ) {
             maps.color.image.data.set([
-              pixels[p] * alpha,
-              pixels[p + 1] * alpha,
-              pixels[p + 2] * alpha
+              pixels[p] * (map === 'colorRGBheightAlpha' ? 1 : alpha),
+              pixels[p + 1] * (map === 'colorRGBheightAlpha' ? 1 : alpha),
+              pixels[p + 2] * (map === 'colorRGBheightAlpha' ? 1 : alpha)
             ], c);
           }
           if (
