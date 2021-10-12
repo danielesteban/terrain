@@ -7,7 +7,6 @@ import {
 class Renderer {
   constructor() {
     this.clock = new Clock();
-    this.clock.localStartTime = Date.now();
     this.dom = {
       fps: document.getElementById('fps'),
       renderer: document.getElementById('renderer'),

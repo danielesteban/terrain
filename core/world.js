@@ -20,6 +20,7 @@ class World extends Group {
     onLoad,
   }) {
     super();
+    this.auxVector = new Vector3();
     const mesher = new Mesher({
       width,
       height,
@@ -103,22 +104,22 @@ class World extends Group {
     }
   }
 
-  getHeightAt(point, output) {
-    const { mesher, origin } = this;
+  getHeight(point) {
+    const { auxVector, mesher, origin } = this;
     if (!mesher) {
-      return output.copy(point);
+      return point.y;
     }
-    this.worldToLocal(output.copy(point)).sub(origin).floor();
-    const { x, z } = output;
+    this.worldToLocal(auxVector.copy(point)).sub(origin).floor();
+    const { x, z } = auxVector;
     if (
       x < 0 || x >= mesher.width
       || z < 0 || z >= mesher.depth
     ) {
-      output.y = 0;
+      auxVector.y = 0;
     } else {
-      output.y = Math.round(mesher.height * mesher.memory.heightmap.view[z * mesher.width + x]);
+      auxVector.y = Math.round(mesher.height * mesher.memory.heightmap.view[z * mesher.width + x]);
     }
-    return this.localToWorld(output.add(origin));
+    return this.localToWorld(auxVector).y;
   }
 
   load({ map, url }) {
