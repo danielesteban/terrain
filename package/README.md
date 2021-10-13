@@ -5,6 +5,11 @@
 
 > A fast heightmap based voxelizer
 
+#### Examples
+
+ * [three-terrain.glitch.me](https://three-terrain.glitch.me/) ([source](https://glitch.com/edit/#!/three-terrain))
+ * [three-terrain-walk.glitch.me](https://three-terrain-walk.glitch.me/) ([source](https://glitch.com/edit/#!/three-terrain-walk))
+
 #### Installation
 
 ```bash
