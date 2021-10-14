@@ -8,7 +8,7 @@ class Viewer extends Scene {
     this.camera = new PerspectiveCamera(60, 1, 1, 2000);
     this.camera.position.set(
       0,
-      world.mesher.height,
+      world.mesher.height * 1.5,
       world.mesher.depth * 0.1
     );
     this.camera.updateMatrixWorld();
