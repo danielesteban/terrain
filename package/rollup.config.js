@@ -22,7 +22,7 @@ export default {
           license: 'MIT',
           files: ['terrain.js'],
           module: 'terrain.js',
-          version: '0.0.9',
+          version: '0.0.10',
           homepage: 'https://terrain.gatunes.com',
           repository: {
             type: 'git',

@@ -121,7 +121,7 @@ const int mesh(
     || chunkY < 0
     || chunkZ < 0
     || chunkX + chunkSize > world->width
-    || chunkY >= world->height
+    || chunkY > world->height
     || chunkZ + chunkSize > world->depth
   ) {
     return -1;

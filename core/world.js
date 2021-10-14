@@ -75,7 +75,7 @@ class World extends Group {
             for (let z = 0; z < mesher.chunks.z; z++) {
               for (let x = 0; x < mesher.chunks.x; x++) {
                 const subchunks = [];
-                for (let y = 0; y < Math.ceil(mesher.height / mesher.chunkHeight); y++) {
+                for (let y = 0; y < Math.ceil((mesher.height + 1) / mesher.chunkHeight); y++) {
                   const chunk = new Chunk({
                     x: x * mesher.chunkSize,
                     y: y * mesher.chunkHeight,
