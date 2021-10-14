@@ -5,7 +5,6 @@ import Renderer from './core/renderer.js';
 import World from './core/world.js';
 import Editor from './scenes/editor.js';
 import Viewer from './scenes/viewer.js';
-import { SimplexNoise } from 'three/examples/jsm/math/SimplexNoise.js';
 
 const params = location.search.substr(1).split('&').reduce((keys, param) => {
   const [key, val] = param.split('=');
