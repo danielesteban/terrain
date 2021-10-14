@@ -45,9 +45,6 @@ class World extends Group {
         };
         this.maps.color.encoding = sRGBEncoding;
         this.maps.color.flipY = this.maps.height.flipY = true;
-        if (generator) {
-          generator({ maps: this.maps, mesher });
-        }
 
         this.material = Chunk.getMaterial();
         this.material.map = this.material.uniforms.map.value = this.maps.color;
@@ -57,8 +54,9 @@ class World extends Group {
           mesher.depth
         );
 
-        const generate = generator || !(
-          maps.colorRGBheightAlpha
+        const mesh = !(
+          generator
+          || maps.colorRGBheightAlpha
           || maps.colorRGBheightRGB
           || maps.heightAlpha
           || maps.heightR
@@ -75,7 +73,7 @@ class World extends Group {
                 x: x * mesher.chunkSize,
                 y: y * mesher.chunkHeight,
                 z: z * mesher.chunkSize,
-                geometry: generate ? mesher.mesh(x, y, z) : false,
+                geometry: mesh ? mesher.mesh(x, y, z) : false,
                 material: this.material,
                 origin: this.origin,
               });
@@ -96,7 +94,15 @@ class World extends Group {
             return requests;
           }, [])
         )
-          .then(() => onLoad && onLoad());
+          .then(() => {
+            if (generator) {
+              generator(this);
+              this.remesh();
+            }
+            if (onLoad) {
+              onLoad();
+            }
+          });
       },
     });
   }
