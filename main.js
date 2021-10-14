@@ -6,10 +6,16 @@ import World from './core/world.js';
 import Editor from './scenes/editor.js';
 import Viewer from './scenes/viewer.js';
 
+const params = location.search.substr(1).split('&').reduce((keys, param) => {
+  const [key, val] = param.split('=');
+  keys[key] = parseInt(val, 10) || 0;
+  return keys;
+}, {});
+
 const world = new World({
-  width: 640,
-  height: 255,
-  depth: 640,
+  width: params.width || 640,
+  height: params.height || 255,
+  depth: params.depth || params.width || 640,
   onLoad: () => {
     const renderer = new Renderer();
     const viewer = new Viewer({ renderer, world });
