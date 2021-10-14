@@ -54,35 +54,8 @@ class World extends Group {
           mesher.depth
         );
 
-        const mesh = !(
-          generator
-          || maps.colorRGBheightAlpha
-          || maps.colorRGBheightRGB
-          || maps.heightAlpha
-          || maps.heightR
-          || maps.heightRGB
-        );
         this.mesher = mesher;
-        this.chunks = [];
         this.origin = new Vector3(mesher.width * -0.5, 0, mesher.depth * -0.5);
-        for (let z = 0; z < mesher.chunks.z; z++) {
-          for (let x = 0; x < mesher.chunks.x; x++) {
-            const subchunks = [];
-            for (let y = 0; y < Math.ceil(mesher.height / mesher.chunkHeight); y++) {
-              const chunk = new Chunk({
-                x: x * mesher.chunkSize,
-                y: y * mesher.chunkHeight,
-                z: z * mesher.chunkSize,
-                geometry: mesh ? mesher.mesh(x, y, z) : false,
-                material: this.material,
-                origin: this.origin,
-              });
-              subchunks.push(chunk);
-              this.add(chunk);
-            }
-            this.chunks.push(subchunks);
-          }
-        }
 
         Promise.all(
           Object.keys(maps).reduce((requests, map) => {
@@ -97,7 +70,25 @@ class World extends Group {
           .then(() => {
             if (generator) {
               generator(this);
-              this.remesh();
+            }
+            this.chunks = [];
+            for (let z = 0; z < mesher.chunks.z; z++) {
+              for (let x = 0; x < mesher.chunks.x; x++) {
+                const subchunks = [];
+                for (let y = 0; y < Math.ceil(mesher.height / mesher.chunkHeight); y++) {
+                  const chunk = new Chunk({
+                    x: x * mesher.chunkSize,
+                    y: y * mesher.chunkHeight,
+                    z: z * mesher.chunkSize,
+                    geometry: mesher.mesh(x, y, z),
+                    material: this.material,
+                    origin: this.origin,
+                  });
+                  subchunks.push(chunk);
+                  this.add(chunk);
+                }
+                this.chunks.push(subchunks);
+              }
             }
             if (onLoad) {
               onLoad();
@@ -242,7 +233,7 @@ class World extends Group {
 
   remesh(uv) {
     const { chunks, mesher } = this;
-    if (!mesher) {
+    if (!chunks) {
       return;
     }
     if (!uv) {
